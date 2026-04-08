@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Hub — BSN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Montserrat', sans-serif; background: #f4f6f9; }
+    ::-webkit-scrollbar { display: none; }
+    @keyframes slideIn  { from { width: 0 } to { width: 100% } }
+    @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px) } to { opacity: 1; transform: translateY(0) } }
+    @keyframes pulse    { 0%,100% { opacity: .3; transform: scale(0.8) } 50% { opacity: 1; transform: scale(1.2) } }
+    @keyframes heroProgress { from { width: 0% } to { width: 100% } }
+    button { font-family: 'Montserrat', sans-serif; }
+    button:hover { opacity: 0.92; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script>
+const {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback
+} = React;
+const T = {
+  bg: "#f4f6f9",
+  surface: "#ffffff",
+  card: "#ffffff",
+  border: "#e2e8f0",
+  heading: "#0f172a",
+  body: "#334155",
+  muted: "#64748b",
+  dimmed: "#94a3b8",
+  teal: "#308c83",
+  tealLight: "#c1ddd8",
+  tealBg: "rgba(48,140,131,0.08)",
+  orange: "#ea580c",
+  red: "#ef4444",
+  cardImgOverlay: "linear-gradient(180deg, rgba(7,20,34,0.05) 0%, rgba(7,20,34,0.8) 70%, rgba(7,20,34,0.95) 100%)"
+};
+const F = "'Montserrat', sans-serif";
+function cardSvg(icon, g1, g2, accent, pattern) {
+  const P = {
+    circles: `<circle cx="200" cy="120" r="80" fill="none" stroke="${accent}" stroke-width="1" opacity=".15"/><circle cx="200" cy="120" r="50" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".2"/><circle cx="200" cy="120" r="25" fill="none" stroke="${accent}" stroke-width="2" opacity=".3"/>`,
+    grid: `${[50, 100, 150, 200, 250, 300, 350].map(x => `<line x1="${x}" y1="0" x2="${x}" y2="240" stroke="${accent}" stroke-width=".5" opacity=".07"/>`).join("")}${[40, 80, 120, 160, 200].map(y => `<line x1="0" y1="${y}" x2="400" y2="${y}" stroke="${accent}" stroke-width=".5" opacity=".07"/>`).join("")}`,
+    hex: `<polygon points="200,40 240,65 240,105 200,130 160,105 160,65" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".2"/><polygon points="200,55 230,72 230,102 200,118 170,102 170,72" fill="none" stroke="${accent}" stroke-width="1" opacity=".3"/>`,
+    diamond: `<rect x="165" y="85" width="70" height="70" rx="4" transform="rotate(45 200 120)" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".2"/><rect x="178" y="98" width="44" height="44" rx="2" transform="rotate(45 200 120)" fill="none" stroke="${accent}" stroke-width="1" opacity=".3"/>`,
+    waves: `${[80, 110, 140, 170].map((y, i) => `<path d="M0,${y} Q100,${y - 30} 200,${y} T400,${y}" fill="none" stroke="${accent}" stroke-width=".8" opacity="${.08 + i * .02}"/>`).join("")}`,
+    shield: `<path d="M200,50 L250,75 L250,130 L200,160 L150,130 L150,75 Z" fill="none" stroke="${accent}" stroke-width="2" opacity=".2"/><path d="M200,65 L237,84 L237,125 L200,148 L163,125 L163,84 Z" fill="none" stroke="${accent}" stroke-width="1" opacity=".3"/>`,
+    nodes: `<circle cx="120" cy="80" r="4" fill="${accent}" opacity=".3"/><circle cx="200" cy="60" r="4" fill="${accent}" opacity=".3"/><circle cx="280" cy="90" r="4" fill="${accent}" opacity=".3"/><circle cx="160" cy="140" r="4" fill="${accent}" opacity=".3"/><circle cx="250" cy="150" r="4" fill="${accent}" opacity=".3"/><line x1="120" y1="80" x2="200" y2="60" stroke="${accent}" stroke-width=".8" opacity=".15"/><line x1="200" y1="60" x2="280" y2="90" stroke="${accent}" stroke-width=".8" opacity=".15"/><line x1="120" y1="80" x2="160" y2="140" stroke="${accent}" stroke-width=".8" opacity=".15"/><line x1="280" y1="90" x2="250" y2="150" stroke="${accent}" stroke-width=".8" opacity=".15"/><line x1="160" y1="140" x2="250" y2="150" stroke="${accent}" stroke-width=".8" opacity=".15"/>`,
+    cube: `<path d="M200,50 L260,85 L260,145 L200,180 L140,145 L140,85 Z" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".2"/><line x1="200" y1="50" x2="200" y2="115" stroke="${accent}" stroke-width="1" opacity=".15"/><line x1="200" y1="115" x2="260" y2="145" stroke="${accent}" stroke-width="1" opacity=".15"/><line x1="200" y1="115" x2="140" y2="145" stroke="${accent}" stroke-width="1" opacity=".15"/>`
+  };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240"><defs><radialGradient id="b" cx="50%" cy="45%" r="70%"><stop offset="0%" stop-color="${g1}"/><stop offset="100%" stop-color="${g2}"/></radialGradient><radialGradient id="g" cx="50%" cy="45%" r="35%"><stop offset="0%" stop-color="${accent}" stop-opacity=".18"/><stop offset="100%" stop-color="${accent}" stop-opacity="0"/></radialGradient></defs><rect width="400" height="240" fill="url(#b)"/><rect width="400" height="240" fill="url(#g)"/>${P[pattern] || P.circles}<text x="200" y="135" text-anchor="middle" font-size="54">${icon}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+const ALL_COURSES = [{
+  id: 1,
+  title: "Threat",
+  subtitle: "Intelligence",
+  category: "Cybersecurity",
+  type: "Course",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Intermediate",
+  img: cardSvg("\u{1F6E1}", "#0a1628", "#0d2847", "#2dd4bf", "shield"),
+  duration: "12 Min"
+}, {
+  id: 2,
+  title: "Network Defense",
+  subtitle: "Fundamentals",
+  category: "Cybersecurity",
+  type: "Course",
+  role: "IT Staff",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u{1F512}", "#0c1a30", "#0a2540", "#38bdf8", "nodes"),
+  duration: "12 Min"
+}, {
+  id: 3,
+  title: "Incident",
+  subtitle: "Response",
+  category: "Cybersecurity",
+  type: "Course",
+  role: "IT Staff",
+  status: "In Progress",
+  skill: "Advanced",
+  img: cardSvg("\u26A1", "#0d1525", "#102040", "#f59e0b", "grid"),
+  duration: "12 Min"
+}, {
+  id: 4,
+  title: "Cloud Security",
+  subtitle: "Essentials",
+  category: "Cybersecurity",
+  type: "Micro Learning",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u2601", "#081830", "#0c2a4a", "#818cf8", "hex"),
+  duration: "12 Min"
+}, {
+  id: 5,
+  title: "Identity & Access",
+  subtitle: "Management",
+  category: "Cybersecurity",
+  type: "Course",
+  role: "Management",
+  status: "Completed",
+  skill: "Intermediate",
+  img: cardSvg("\u{1F511}", "#0a1525", "#0f2845", "#a78bfa", "circles"),
+  duration: "12 Min"
+}, {
+  id: 6,
+  title: "Phishing",
+  subtitle: "Awareness",
+  category: "Cybersecurity",
+  type: "Micro Learning",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u{1F3A3}", "#0d1a2a", "#102538", "#f472b6", "waves"),
+  duration: "12 Min"
+}, {
+  id: 7,
+  title: "The Age of",
+  subtitle: "Artificial Intelligence",
+  category: "Artificial Intelligence",
+  type: "Course",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u{1F9E0}", "#0a0f20", "#121d3a", "#a78bfa", "nodes"),
+  duration: "12 Min"
+}, {
+  id: 8,
+  title: "AI Ethics in",
+  subtitle: "Business",
+  category: "Artificial Intelligence",
+  type: "Course",
+  role: "Management",
+  status: "Not Started",
+  skill: "Intermediate",
+  img: cardSvg("\u2696", "#0c1525", "#152040", "#34d399", "hex"),
+  duration: "12 Min"
+}, {
+  id: 9,
+  title: "Build Your",
+  subtitle: "Own LLM",
+  category: "Artificial Intelligence",
+  type: "Course",
+  role: "IT Staff",
+  status: "In Progress",
+  skill: "Advanced",
+  img: cardSvg("\u{1F9CA}", "#081828", "#0d2540", "#38bdf8", "cube"),
+  duration: "12 Min"
+}, {
+  id: 10,
+  title: "ChatGPT",
+  subtitle: "Basics",
+  category: "Artificial Intelligence",
+  type: "Micro Learning",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u{1F4AC}", "#0a1425", "#0f2238", "#2dd4bf", "diamond"),
+  duration: "12 Min"
+}, {
+  id: 11,
+  title: "AI for",
+  subtitle: "Productivity",
+  category: "Artificial Intelligence",
+  type: "Micro Learning",
+  role: "All Employees",
+  status: "Completed",
+  skill: "Beginner",
+  img: cardSvg("\u{1F680}", "#0d1828", "#122640", "#818cf8", "grid"),
+  duration: "12 Min"
+}, {
+  id: 12,
+  title: "Prompt",
+  subtitle: "Engineering",
+  category: "Artificial Intelligence",
+  type: "Course",
+  role: "IT Staff",
+  status: "Not Started",
+  skill: "Intermediate",
+  img: cardSvg("\u2728", "#0a1220", "#0f1e38", "#f59e0b", "circles"),
+  duration: "12 Min"
+}, {
+  id: 13,
+  title: "2026 HIPAA Security and",
+  subtitle: "Privacy Training",
+  category: "Compliance",
+  type: "Course",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u{1F3E5}", "#0a1628", "#0d2540", "#38bdf8", "shield"),
+  duration: "12 Min"
+}, {
+  id: 14,
+  title: "Personal Protective",
+  subtitle: "Equipment",
+  category: "Compliance",
+  type: "Course",
+  role: "All Employees",
+  status: "In Progress",
+  skill: "Beginner",
+  img: cardSvg("\u{1F9BA}", "#0c1a28", "#102240", "#f59e0b", "diamond"),
+  duration: "12 Min"
+}, {
+  id: 15,
+  title: "Fraud, Waste and Abuse for",
+  subtitle: "Healthcare Training",
+  category: "Compliance",
+  type: "Course",
+  role: "Management",
+  status: "Not Started",
+  skill: "Intermediate",
+  img: cardSvg("\u{1F4CB}", "#0a1525", "#0f2038", "#ef4444", "waves"),
+  duration: "12 Min"
+}, {
+  id: 16,
+  title: "GDPR",
+  subtitle: "Essentials",
+  category: "Compliance",
+  type: "Micro Learning",
+  role: "All Employees",
+  status: "Completed",
+  skill: "Beginner",
+  img: cardSvg("\u{1F510}", "#081520", "#0d2035", "#a78bfa", "hex"),
+  duration: "12 Min"
+}, {
+  id: 17,
+  title: "Time",
+  subtitle: "Management",
+  category: "Productivity",
+  type: "Micro Learning",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u23F1", "#0c1828", "#102540", "#2dd4bf", "circles"),
+  duration: "12 Min"
+}, {
+  id: 18,
+  title: "Remote Work",
+  subtitle: "Best Practices",
+  category: "Productivity",
+  type: "Course",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u{1F3E0}", "#0a1425", "#0f2038", "#818cf8", "grid"),
+  duration: "12 Min"
+}, {
+  id: 19,
+  title: "Microsoft 365",
+  subtitle: "Essentials",
+  category: "Productivity",
+  type: "Course",
+  role: "IT Staff",
+  status: "In Progress",
+  skill: "Intermediate",
+  img: cardSvg("\u{1F4BB}", "#0d1a2a", "#122640", "#38bdf8", "cube"),
+  duration: "12 Min"
+}, {
+  id: 20,
+  title: "Email Security",
+  subtitle: "Best Practices",
+  category: "Productivity",
+  type: "Newsletter",
+  role: "All Employees",
+  status: "Not Started",
+  skill: "Beginner",
+  img: cardSvg("\u2709", "#0a1525", "#0f2238", "#34d399", "nodes"),
+  duration: "8 Min"
+}];
+const COURSES_BY_CAT = ALL_COURSES.reduce((a, c) => {
+  (a[c.category] = a[c.category] || []).push(c);
+  return a;
+}, {});
+const FILTER_OPTS = {
+  "Content Type": ["Course", "Micro Learning", "Newsletter"],
+  "Status": ["Not Started", "In Progress", "Completed"],
+  "Skill Level": ["Beginner", "Intermediate", "Advanced"]
+};
+const FILTER_KEY = {
+  "Content Type": "type",
+  "Status": "status",
+  "Skill Level": "skill"
+};
+const QUICK_FILTERS = ["Featured", "All Content", "Artificial Intelligence", "Compliance", "Cybersecurity", "Productivity"];
+const QF_ICONS = ["☆", "◎", "✧", "♡", "⛨", "⚡"];
+const imgChipStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  padding: "4px 10px",
+  borderRadius: 6,
+  fontSize: 11.5,
+  fontWeight: 600,
+  fontFamily: F,
+  background: "rgba(0,0,0,0.55)",
+  backdropFilter: "blur(8px)",
+  color: "#f1f5f9"
+};
+const heroChipStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  padding: "4px 10px",
+  borderRadius: 6,
+  fontSize: 11.5,
+  fontWeight: 600,
+  fontFamily: F
+};
+const arrowBtnStyle = side => ({
+  position: "absolute",
+  top: "50%",
+  [side]: 4,
+  transform: "translateY(-50%)",
+  width: 36,
+  height: 36,
+  borderRadius: "50%",
+  background: "rgba(255,255,255,0.9)",
+  border: `1px solid ${T.border}`,
+  color: T.body,
+  fontSize: 22,
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 10,
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  lineHeight: 1
+});
+function BSNTopNav() {
+  return /*#__PURE__*/React.createElement("nav", {
+    style: {
+      background: "#082f49",
+      height: 58,
+      padding: "0 24px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      position: "sticky",
+      top: 0,
+      zIndex: 200,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      color: "white",
+      fontWeight: 700,
+      fontSize: 16,
+      letterSpacing: "0.5px",
+      fontFamily: F
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 36,
+      height: 36,
+      background: "#308c83",
+      borderRadius: 8,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 18
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-shield-halved",
+    style: {
+      color: "white"
+    }
+  })), /*#__PURE__*/React.createElement("span", null, "BREACH SECURE NOW")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      background: "rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.15)",
+      borderRadius: 20,
+      padding: "5px 10px"
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-regular fa-sun",
+    style: {
+      fontSize: 12,
+      color: "rgba(255,255,255,0.55)"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 28,
+      height: 14,
+      background: "rgba(255,255,255,0.2)",
+      borderRadius: 7,
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 10,
+      height: 10,
+      background: "white",
+      borderRadius: "50%",
+      position: "absolute",
+      top: 2,
+      left: 2
+    }
+  })), /*#__PURE__*/React.createElement("i", {
+    className: "fa-regular fa-moon",
+    style: {
+      fontSize: 12,
+      color: "rgba(255,255,255,0.55)"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 36,
+      height: 36,
+      borderRadius: "50%",
+      background: "rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.12)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      color: "rgba(255,255,255,0.75)",
+      fontSize: 16,
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-regular fa-bell"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+      width: 7,
+      height: 7,
+      borderRadius: "50%",
+      background: "#ef4444",
+      border: "1.5px solid #082f49"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 36,
+      height: 36,
+      borderRadius: "50%",
+      background: "#308c83",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "white",
+      fontSize: 13,
+      fontWeight: 700,
+      fontFamily: F,
+      cursor: "pointer"
+    }
+  }, "JD")));
+}
+function BSNSidebar() {
+  const [hovered, setHovered] = useState(null);
+  const items = [{
+    icon: "fa-house",
+    label: "Home",
+    href: "prototype.html",
+    active: false
+  }, {
+    icon: "fa-graduation-cap",
+    label: "Training Hub",
+    href: "#",
+    active: true
+  }, {
+    icon: "fa-building-user",
+    label: "My Company",
+    href: "manager-dashboard.html",
+    active: false
+  }, {
+    icon: "fa-briefcase",
+    label: "Manage Clients",
+    href: "#",
+    active: false
+  }];
+  return /*#__PURE__*/React.createElement("aside", {
+    style: {
+      width: 200,
+      background: "#0a1e2e",
+      display: "flex",
+      flexDirection: "column",
+      padding: "20px 12px",
+      gap: 4,
+      flexShrink: 0,
+      position: "sticky",
+      top: 58,
+      height: "calc(100vh - 58px)",
+      overflowY: "auto"
+    }
+  }, items.map((item, i) => /*#__PURE__*/React.createElement("a", {
+    key: i,
+    href: item.href,
+    onMouseEnter: () => setHovered(i),
+    onMouseLeave: () => setHovered(null),
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "10px 12px",
+      borderRadius: 10,
+      color: item.active ? "white" : hovered === i ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)",
+      textDecoration: "none",
+      fontFamily: F,
+      background: item.active ? "rgba(48,140,131,0.15)" : hovered === i ? "rgba(255,255,255,0.06)" : "transparent",
+      transition: "all 0.3s",
+      position: "relative",
+      cursor: "pointer"
+    }
+  }, item.active && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      left: -12,
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: 3,
+      height: 24,
+      background: "#308c83",
+      borderRadius: "0 2px 2px 0"
+    }
+  }), /*#__PURE__*/React.createElement("i", {
+    className: `fas ${item.icon}`,
+    style: {
+      fontSize: 16,
+      width: 20,
+      textAlign: "center"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      lineHeight: 1
+    }
+  }, item.label))));
+}
+function SubNav({
+  activeTab,
+  setActiveTab,
+  children
+}) {
+  const tabs = ["Library", "Completed Courses", "Training Report"];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "0 24px",
+      background: T.surface,
+      borderBottom: `1px solid ${T.border}`,
+      flexWrap: "wrap",
+      gap: 8,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center"
+    }
+  }, tabs.map(tab => /*#__PURE__*/React.createElement("button", {
+    key: tab,
+    onClick: () => setActiveTab(tab),
+    style: {
+      padding: "14px 16px",
+      background: "none",
+      border: "none",
+      borderBottom: activeTab === tab ? `2px solid ${T.teal}` : "2px solid transparent",
+      color: activeTab === tab ? T.heading : T.muted,
+      fontWeight: activeTab === tab ? 700 : 500,
+      fontSize: 13,
+      cursor: "pointer",
+      fontFamily: F,
+      transition: "all 0.2s"
+    }
+  }, tab))), children, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      background: T.bg,
+      borderRadius: 8,
+      padding: "7px 14px",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-magnifying-glass",
+    style: {
+      color: T.dimmed,
+      fontSize: 13
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.dimmed,
+      fontSize: 12.5,
+      fontFamily: F
+    }
+  }, "What are you looking for?")));
+}
+function heroSvg(icon, g1, g2, accent, pattern) {
+  const P = {
+    shield: `<path d="M700,100 L780,145 L780,225 L700,270 L620,225 L620,145 Z" fill="none" stroke="${accent}" stroke-width="2.5" opacity=".15"/><path d="M700,120 L765,155 L765,215 L700,250 L635,215 L635,155 Z" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".25"/>`,
+    nodes: `<circle cx="550" cy="100" r="5" fill="${accent}" opacity=".3"/><circle cx="650" cy="70" r="5" fill="${accent}" opacity=".3"/><circle cx="750" cy="110" r="5" fill="${accent}" opacity=".3"/><circle cx="850" cy="80" r="5" fill="${accent}" opacity=".3"/><line x1="550" y1="100" x2="650" y2="70" stroke="${accent}" stroke-width="1" opacity=".12"/><line x1="650" y1="70" x2="750" y2="110" stroke="${accent}" stroke-width="1" opacity=".12"/><line x1="750" y1="110" x2="850" y2="80" stroke="${accent}" stroke-width="1" opacity=".12"/>`,
+    hex: `<polygon points="700,60 760,95 760,155 700,190 640,155 640,95" fill="none" stroke="${accent}" stroke-width="2" opacity=".15"/><polygon points="700,80 745,105 745,145 700,170 655,145 655,105" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".25"/>`,
+    grid: `${[500, 560, 620, 680, 740, 800, 860, 920].map(x => `<line x1="${x}" y1="0" x2="${x}" y2="300" stroke="${accent}" stroke-width=".6" opacity=".06"/>`).join("")}${[40, 80, 120, 160, 200, 240].map(y => `<line x1="450" y1="${y}" x2="950" y2="${y}" stroke="${accent}" stroke-width=".6" opacity=".06"/>`).join("")}`
+  };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320"><defs><radialGradient id="hb" cx="65%" cy="50%" r="50%"><stop offset="0%" stop-color="${g1}"/><stop offset="100%" stop-color="${g2}"/></radialGradient></defs><rect width="1200" height="320" fill="url(#hb)"/>${P[pattern] || P.nodes}<text x="720" y="175" text-anchor="middle" font-size="72" opacity=".8">${icon}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+const HERO_SLIDES = [{
+  title: "2026 Cybersecurity Training",
+  desc: "Learn to detect, mitigate, and respond to real-world cyber threats in your work environment.",
+  category: "Cybersecurity",
+  duration: "5 Min",
+  status: "Not Started",
+  img: heroSvg("\u{1F6E1}", "#071830", "#0d2a4a", "#2dd4bf", "shield")
+}, {
+  title: "The Age of Artificial Intelligence",
+  desc: "Explore the foundations of AI and understand how it's transforming every industry today.",
+  category: "Artificial Intelligence",
+  duration: "12 Min",
+  status: "Not Started",
+  img: heroSvg("\u{1F9E0}", "#070d20", "#0f1d3a", "#a78bfa", "nodes")
+}, {
+  title: "2026 HIPAA Security & Privacy",
+  desc: "Stay compliant with the latest HIPAA regulations and protect sensitive healthcare data.",
+  category: "Compliance",
+  duration: "12 Min",
+  status: "Not Started",
+  img: heroSvg("\u{1F3E5}", "#071828", "#0d2540", "#38bdf8", "hex")
+}, {
+  title: "Phishing Awareness Training",
+  desc: "Identify phishing attempts, social engineering tactics, and protect your organization.",
+  category: "Cybersecurity",
+  duration: "8 Min",
+  status: "In Progress",
+  img: heroSvg("\u{1F3A3}", "#0d1525", "#102538", "#f472b6", "grid")
+}];
+function HeroSection() {
+  const [s, setS] = useState(0);
+  const n = HERO_SLIDES.length;
+  const [fade, setFade] = useState(true);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setS(p => (p + 1) % n);
+        setFade(true);
+      }, 300);
+    }, 5000);
+    return () => clearInterval(t);
+  }, [n]);
+  const goTo = i => {
+    if (i === s) return;
+    setFade(false);
+    setTimeout(() => {
+      setS(i);
+      setFade(true);
+    }, 200);
+  };
+  const slide = HERO_SLIDES[s];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative",
+      height: 320,
+      overflow: "hidden",
+      background: "#071830"
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: slide.img,
+    alt: "",
+    style: {
+      position: "absolute",
+      inset: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      opacity: fade ? 1 : 0,
+      transition: "opacity 0.4s ease"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      background: "linear-gradient(90deg, rgba(7,24,48,0.95) 0%, rgba(7,24,48,0.8) 40%, rgba(7,24,48,0.3) 65%, rgba(7,24,48,0.1) 100%)"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      padding: "40px 48px",
+      opacity: fade ? 1 : 0,
+      transition: "opacity 0.35s ease"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      ...heroChipStyle,
+      background: "rgba(48,140,131,0.2)",
+      color: "#2dd4bf"
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-clock",
+    style: {
+      fontSize: 10
+    }
+  }), " ", slide.duration), /*#__PURE__*/React.createElement("span", {
+    style: {
+      ...heroChipStyle,
+      background: "rgba(148,163,184,0.15)",
+      color: slide.status === "In Progress" ? "#fb923c" : "#94a3b8"
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-play",
+    style: {
+      fontSize: 10
+    }
+  }), " ", slide.status)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      ...heroChipStyle,
+      background: "rgba(148,163,184,0.1)",
+      color: "#94a3b8",
+      fontSize: 11
+    }
+  }, slide.category)), /*#__PURE__*/React.createElement("h1", {
+    style: {
+      color: "#f1f5f9",
+      fontSize: 34,
+      fontWeight: 800,
+      fontFamily: F,
+      lineHeight: 1.15,
+      margin: "0 0 12px 0",
+      maxWidth: 480,
+      textTransform: "uppercase",
+      letterSpacing: .5
+    }
+  }, slide.title), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#94a3b8",
+      fontSize: 13.5,
+      lineHeight: 1.6,
+      maxWidth: 400,
+      margin: "0 0 20px 0",
+      fontFamily: F
+    }
+  }, slide.desc), /*#__PURE__*/React.createElement("button", {
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      background: "#308c83",
+      color: "white",
+      border: "none",
+      borderRadius: 8,
+      padding: "11px 24px",
+      fontWeight: 700,
+      fontSize: 14,
+      cursor: "pointer",
+      fontFamily: F,
+      width: "fit-content"
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-play",
+    style: {
+      fontSize: 12
+    }
+  }), " Start Training")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      bottom: 20,
+      right: 40,
+      display: "flex",
+      alignItems: "center",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#f1f5f9",
+      fontSize: 22,
+      fontWeight: 700,
+      fontFamily: F
+    }
+  }, "0", s + 1), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6
+    }
+  }, Array.from({
+    length: n
+  }).map((_, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    onClick: () => goTo(i),
+    style: {
+      width: i === s ? 28 : 8,
+      height: 4,
+      borderRadius: 2,
+      background: i === s ? "#308c83" : "rgba(255,255,255,0.3)",
+      cursor: "pointer",
+      transition: "all 0.3s"
+    }
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 3,
+      background: "rgba(255,255,255,0.05)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    key: s,
+    style: {
+      height: "100%",
+      background: "#308c83",
+      animation: "heroProgress 5s linear",
+      borderRadius: "0 2px 2px 0"
+    }
+  })));
+}
+function QuickFilterChips({
+  active,
+  onSelect,
+  style: outerStyle
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      flexWrap: "wrap",
+      ...outerStyle
+    }
+  }, QUICK_FILTERS.map((cat, i) => /*#__PURE__*/React.createElement("button", {
+    key: cat,
+    onClick: () => onSelect(cat),
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 5,
+      padding: "6px 14px",
+      borderRadius: 20,
+      border: `1px solid ${active === cat ? T.teal : T.border}`,
+      background: active === cat ? T.tealBg : T.surface,
+      color: active === cat ? T.teal : T.muted,
+      fontSize: 12.5,
+      fontWeight: active === cat ? 700 : 500,
+      cursor: "pointer",
+      fontFamily: F,
+      transition: "all 0.2s",
+      whiteSpace: "nowrap"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12
+    }
+  }, QF_ICONS[i]), cat)));
+}
+function CourseCard({
+  course
+}) {
+  const [h, setH] = useState(false);
+  return /*#__PURE__*/React.createElement("div", {
+    onMouseEnter: () => setH(true),
+    onMouseLeave: () => setH(false),
+    style: {
+      minWidth: 200,
+      width: 200,
+      borderRadius: 12,
+      overflow: "hidden",
+      background: T.card,
+      cursor: "pointer",
+      transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+      transform: h ? "scale(1.04) translateY(-4px)" : "scale(1)",
+      boxShadow: h ? "0 12px 40px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.06)",
+      flexShrink: 0,
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative",
+      height: 155,
+      overflow: "hidden",
+      background: "#0b1929"
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: course.img,
+    alt: course.title,
+    style: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      transition: "transform 0.4s",
+      transform: h ? "scale(1.08)" : "scale(1)"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      background: T.cardImgOverlay
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: 10,
+      left: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      ...imgChipStyle,
+      fontSize: 10.5
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-clock",
+    style: {
+      fontSize: 9
+    }
+  }), " ", course.duration))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "12px 14px 16px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.heading,
+      fontSize: 12,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: .8,
+      fontFamily: F,
+      lineHeight: 1.35
+    }
+  }, course.title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.teal,
+      fontSize: 12,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: .8,
+      fontFamily: F
+    }
+  }, course.subtitle), h && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      height: 3,
+      borderRadius: 2,
+      background: `linear-gradient(90deg,${T.teal},transparent)`,
+      animation: "slideIn 0.3s ease"
+    }
+  })));
+}
+function GridCard({
+  course
+}) {
+  const [h, setH] = useState(false);
+  return /*#__PURE__*/React.createElement("div", {
+    onMouseEnter: () => setH(true),
+    onMouseLeave: () => setH(false),
+    style: {
+      borderRadius: 12,
+      overflow: "hidden",
+      background: T.card,
+      cursor: "pointer",
+      transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+      transform: h ? "scale(1.03) translateY(-3px)" : "scale(1)",
+      boxShadow: h ? "0 12px 40px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.06)",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative",
+      height: 160,
+      overflow: "hidden",
+      background: "#0b1929"
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: course.img,
+    alt: course.title,
+    style: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      transition: "transform 0.4s",
+      transform: h ? "scale(1.06)" : "scale(1)"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      background: T.cardImgOverlay
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: 10,
+      left: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      ...imgChipStyle,
+      fontSize: 10
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-clock",
+    style: {
+      fontSize: 9
+    }
+  }), " ", course.duration)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: 10,
+      right: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      ...imgChipStyle,
+      fontSize: 10,
+      color: course.status === "Completed" ? "#34d399" : course.status === "In Progress" ? "#fb923c" : "#94a3b8"
+    }
+  }, course.status))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "12px 14px 14px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.heading,
+      fontSize: 12.5,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: .8,
+      fontFamily: F,
+      lineHeight: 1.35
+    }
+  }, course.title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.teal,
+      fontSize: 12,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: .8,
+      fontFamily: F,
+      marginBottom: 8
+    }
+  }, course.subtitle), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      color: T.muted,
+      background: T.bg,
+      padding: "2px 8px",
+      borderRadius: 4,
+      fontFamily: F,
+      fontWeight: 500
+    }
+  }, course.type), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      color: T.muted,
+      background: T.bg,
+      padding: "2px 8px",
+      borderRadius: 4,
+      fontFamily: F,
+      fontWeight: 500
+    }
+  }, course.skill))));
+}
+function CourseSection({
+  title,
+  courses
+}) {
+  const ref = useRef(null);
+  const [cL, sCL] = useState(false);
+  const [cR, sCR] = useState(true);
+  const chk = () => {
+    if (!ref.current) return;
+    const e = ref.current;
+    sCL(e.scrollLeft > 5);
+    sCR(e.scrollLeft < e.scrollWidth - e.clientWidth - 5);
+  };
+  useEffect(chk, []);
+  const scr = d => {
+    ref.current?.scrollBy({
+      left: d * 280,
+      behavior: "smooth"
+    });
+    setTimeout(chk, 350);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "8px 0 0"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "0 28px",
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      color: T.heading,
+      fontSize: 18,
+      fontWeight: 700,
+      margin: 0,
+      fontFamily: F
+    }
+  }, title), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.teal,
+      fontSize: 12.5,
+      cursor: "pointer",
+      fontFamily: F,
+      fontWeight: 600
+    }
+  }, "View All")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, cL && /*#__PURE__*/React.createElement("button", {
+    onClick: () => scr(-1),
+    style: arrowBtnStyle("left")
+  }, "\u2039"), /*#__PURE__*/React.createElement("div", {
+    ref: ref,
+    onScroll: chk,
+    style: {
+      display: "flex",
+      gap: 18,
+      overflowX: "auto",
+      padding: "4px 28px 16px",
+      scrollBehavior: "smooth",
+      scrollbarWidth: "none"
+    }
+  }, courses.map((c, i) => /*#__PURE__*/React.createElement(CourseCard, {
+    key: i,
+    course: c
+  }))), cR && /*#__PURE__*/React.createElement("button", {
+    onClick: () => scr(1),
+    style: arrowBtnStyle("right")
+  }, "\u203A")));
+}
+function DropdownFilter({
+  label,
+  options,
+  selected,
+  onSelect
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const has = selected.length > 0;
+  useEffect(() => {
+    const h = e => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+  return /*#__PURE__*/React.createElement("div", {
+    ref: ref,
+    style: {
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setOpen(!open),
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      padding: "8px 14px",
+      borderRadius: 8,
+      border: `1px solid ${has ? T.teal : T.border}`,
+      background: has ? T.tealBg : T.surface,
+      color: has ? T.teal : T.body,
+      fontSize: 13,
+      fontFamily: F,
+      cursor: "pointer",
+      fontWeight: has ? 700 : 500,
+      transition: "all 0.2s",
+      minWidth: 140
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1,
+      textAlign: "left"
+    }
+  }, label), has && /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: T.teal,
+      color: "#fff",
+      fontSize: 10,
+      fontWeight: 800,
+      padding: "1px 6px",
+      borderRadius: 8,
+      lineHeight: "16px"
+    }
+  }, selected.length), /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-chevron-down",
+    style: {
+      fontSize: 10,
+      transition: "transform 0.2s",
+      transform: open ? "rotate(180deg)" : "rotate(0)",
+      color: T.muted
+    }
+  })), open && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: "calc(100% + 6px)",
+      left: 0,
+      minWidth: 200,
+      background: T.surface,
+      border: `1px solid ${T.border}`,
+      borderRadius: 10,
+      padding: "8px 0",
+      zIndex: 60,
+      boxShadow: "0 12px 40px rgba(0,0,0,0.12)"
+    }
+  }, options.map(opt => {
+    const active = selected.includes(opt);
+    return /*#__PURE__*/React.createElement("div", {
+      key: opt,
+      onClick: () => onSelect(opt),
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "8px 16px",
+        cursor: "pointer",
+        background: active ? T.tealBg : "transparent"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 16,
+        height: 16,
+        borderRadius: 4,
+        border: `2px solid ${active ? T.teal : T.border}`,
+        background: active ? T.teal : "transparent",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0
+      }
+    }, active && /*#__PURE__*/React.createElement("i", {
+      className: "fas fa-check",
+      style: {
+        color: "#fff",
+        fontSize: 9
+      }
+    })), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: active ? T.heading : T.body,
+        fontSize: 13,
+        fontFamily: F
+      }
+    }, opt));
+  }), has && /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: `1px solid ${T.border}`,
+      marginTop: 4,
+      paddingTop: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    onClick: () => {
+      options.forEach(o => {
+        if (selected.includes(o)) onSelect(o);
+      });
+    },
+    style: {
+      padding: "8px 16px",
+      cursor: "pointer",
+      color: T.teal,
+      fontSize: 12,
+      fontFamily: F,
+      fontWeight: 600
+    }
+  }, "Clear"))));
+}
+function TopFilterBar({
+  filters,
+  onToggle,
+  activeCount,
+  onClearAll
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "16px 28px",
+      borderBottom: `1px solid ${T.border}`,
+      background: T.surface,
+      flexWrap: "wrap"
+    }
+  }, Object.entries(FILTER_OPTS).map(([group, opts]) => /*#__PURE__*/React.createElement(DropdownFilter, {
+    key: group,
+    label: group,
+    options: opts,
+    selected: filters[group] || [],
+    onSelect: val => onToggle(group, val)
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginLeft: "auto"
+    }
+  }, activeCount > 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: onClearAll,
+    style: {
+      background: "none",
+      border: "none",
+      color: T.teal,
+      fontSize: 12,
+      fontFamily: F,
+      fontWeight: 600,
+      cursor: "pointer"
+    }
+  }, "Clear All"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "8px 14px",
+      borderRadius: 8,
+      border: `1px solid ${T.border}`,
+      color: T.muted,
+      fontSize: 13,
+      fontFamily: F
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-sliders",
+    style: {
+      fontSize: 12
+    }
+  }), " Filter", activeCount > 0 && /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: T.teal,
+      color: "#fff",
+      fontSize: 10,
+      fontWeight: 800,
+      padding: "1px 6px",
+      borderRadius: 8
+    }
+  }, activeCount))));
+}
+const BATCH_SIZE = 10;
+function ViewAllPage({
+  filters,
+  onToggle,
+  onClearAll,
+  categoryFilter
+}) {
+  const activeCount = Object.values(filters).reduce((s, a) => s + a.length, 0) + (categoryFilter ? 1 : 0);
+  const [visible, setVisible] = useState(BATCH_SIZE);
+  const loaderRef = useRef(null);
+  const filtered = useMemo(() => ALL_COURSES.filter(c => {
+    if (categoryFilter && c.category !== categoryFilter) return false;
+    return Object.entries(filters).every(([g, sel]) => {
+      if (!sel.length) return true;
+      return sel.includes(c[FILTER_KEY[g]]);
+    });
+  }), [filters, categoryFilter]);
+  useEffect(() => {
+    setVisible(BATCH_SIZE);
+  }, [filters, categoryFilter]);
+  useEffect(() => {
+    if (!loaderRef.current) return;
+    const obs = new IntersectionObserver(e => {
+      if (e[0].isIntersecting) setVisible(p => Math.min(p + BATCH_SIZE, filtered.length));
+    }, {
+      rootMargin: "200px"
+    });
+    obs.observe(loaderRef.current);
+    return () => obs.disconnect();
+  }, [filtered.length]);
+  const shown = filtered.slice(0, visible);
+  const hasMore = visible < filtered.length;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement(TopFilterBar, {
+    filters: filters,
+    onToggle: onToggle,
+    activeCount: activeCount,
+    onClearAll: onClearAll
+  }), activeCount > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      flexWrap: "wrap",
+      padding: "14px 28px 0"
+    }
+  }, categoryFilter && /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "5px 12px",
+      borderRadius: 20,
+      background: T.tealBg,
+      border: `1px solid ${T.teal}`,
+      color: T.teal,
+      fontSize: 12,
+      fontFamily: F,
+      fontWeight: 500
+    }
+  }, categoryFilter), Object.entries(filters).flatMap(([g, sel]) => sel.map(v => /*#__PURE__*/React.createElement("button", {
+    key: `${g}-${v}`,
+    onClick: () => onToggle(g, v),
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "5px 12px",
+      borderRadius: 20,
+      background: T.tealBg,
+      border: `1px solid ${T.teal}`,
+      color: T.teal,
+      fontSize: 12,
+      fontFamily: F,
+      fontWeight: 500,
+      cursor: "pointer"
+    }
+  }, v, " ", /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-times",
+    style: {
+      fontSize: 11
+    }
+  }))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "20px 28px 40px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      color: T.heading,
+      fontSize: 20,
+      fontWeight: 700,
+      margin: 0,
+      fontFamily: F
+    }
+  }, categoryFilter || "All Content"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.muted,
+      fontSize: 13,
+      fontFamily: F
+    }
+  }, filtered.length, " result", filtered.length !== 1 ? "s" : "")), filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      padding: "60px 0",
+      color: T.dimmed,
+      fontFamily: F
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fas fa-magnifying-glass",
+    style: {
+      fontSize: 48,
+      marginBottom: 12,
+      display: "block",
+      color: T.tealLight
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 16,
+      fontWeight: 700,
+      color: T.body,
+      marginBottom: 6
+    }
+  }, "No courses found"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13
+    }
+  }, "Try adjusting your filters to see more results")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+      gap: 18
+    }
+  }, shown.map((c, i) => /*#__PURE__*/React.createElement("div", {
+    key: c.id,
+    style: {
+      animation: `fadeUp 0.35s ease ${Math.min(i % BATCH_SIZE, 5) * 0.06}s both`
+    }
+  }, /*#__PURE__*/React.createElement(GridCard, {
+    course: c
+  })))), hasMore && /*#__PURE__*/React.createElement("div", {
+    ref: loaderRef,
+    style: {
+      display: "flex",
+      justifyContent: "center",
+      padding: "32px 0"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 6,
+      height: 6,
+      borderRadius: "50%",
+      background: T.teal,
+      animation: "pulse 1s ease infinite"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 6,
+      height: 6,
+      borderRadius: "50%",
+      background: T.teal,
+      animation: "pulse 1s ease 0.2s infinite"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 6,
+      height: 6,
+      borderRadius: "50%",
+      background: T.teal,
+      animation: "pulse 1s ease 0.4s infinite"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.dimmed,
+      fontSize: 13,
+      fontFamily: F,
+      marginLeft: 8
+    }
+  }, "Loading more..."))), !hasMore && filtered.length > BATCH_SIZE && /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      padding: "24px 0",
+      color: T.dimmed,
+      fontSize: 13,
+      fontFamily: F
+    }
+  }, "All ", filtered.length, " courses loaded"))));
+}
+function FeaturedPage({
+  onSelectFilter
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      paddingBottom: 40
+    }
+  }, /*#__PURE__*/React.createElement(HeroSection, null), /*#__PURE__*/React.createElement(QuickFilterChips, {
+    active: "Featured",
+    onSelect: onSelectFilter,
+    style: {
+      justifyContent: "center",
+      padding: "20px 24px 12px"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8
+    }
+  }, Object.entries(COURSES_BY_CAT).map(([cat, courses]) => /*#__PURE__*/React.createElement(CourseSection, {
+    key: cat,
+    title: cat,
+    courses: courses
+  }))));
+}
+const EMPTY_F = {
+  "Content Type": [],
+  "Status": [],
+  "Skill Level": []
+};
+function TrainingHub() {
+  const [activeTab, setActiveTab] = useState("Library");
+  const [activeQF, setActiveQF] = useState("Featured");
+  const [filters, setFilters] = useState({
+    ...EMPTY_F
+  });
+  const categoryFilter = activeQF !== "Featured" && activeQF !== "All Content" ? activeQF : null;
+  const handleQF = useCallback(qf => {
+    setActiveQF(qf);
+    setFilters({
+      ...EMPTY_F
+    });
+  }, []);
+  const handleToggle = useCallback((g, v) => {
+    setFilters(p => {
+      const c = p[g] || [];
+      return {
+        ...p,
+        [g]: c.includes(v) ? c.filter(x => x !== v) : [...c, v]
+      };
+    });
+  }, []);
+  const handleClearAll = useCallback(() => setFilters({
+    ...EMPTY_F
+  }), []);
+  const isFeatured = activeQF === "Featured";
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "100vh",
+      background: T.bg,
+      fontFamily: F
+    }
+  }, /*#__PURE__*/React.createElement(BSNTopNav, null), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement(BSNSidebar, null), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0,
+      display: "flex",
+      flexDirection: "column"
+    }
+  }, /*#__PURE__*/React.createElement(SubNav, {
+    activeTab: activeTab,
+    setActiveTab: setActiveTab
+  }, !isFeatured && /*#__PURE__*/React.createElement(QuickFilterChips, {
+    active: activeQF,
+    onSelect: handleQF,
+    style: {}
+  })), isFeatured ? /*#__PURE__*/React.createElement(FeaturedPage, {
+    onSelectFilter: handleQF
+  }) : /*#__PURE__*/React.createElement(ViewAllPage, {
+    filters: filters,
+    onToggle: handleToggle,
+    onClearAll: handleClearAll,
+    categoryFilter: categoryFilter
+  }))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(TrainingHub));
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Configuration — BSN Portal Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bsn-navy: #082f49;
+      --bsn-teal: #308c83;
+      --bsn-teal-light: #3da89e;
+      --bsn-sidebar: #0a1e2e;
+      --primary-action: #082f49;
+      --accent-teal: #308c83;
+      --page-bg: #f4f7f9;
+      --card-bg: #ffffff;
+      --card-alt-bg: #f6f6f6;
+      --text-primary: #4c5454;
+      --text-dark: #082f49;
+      --text-subtle: #6b7280;
+      --success-green: #2e7d32;
+      --error-red: #c62828;
+      --warning-orange: #ef6c00;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Montserrat', sans-serif; font-size: 14px; color: var(--text-primary); background: var(--page-bg); overflow-x: hidden; }
+
+    /* ── TOP NAV ──────────────────────────────────── */
+    .top-nav {
+      background: var(--bsn-navy); height: 58px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+    }
+    .top-nav .logo { display: flex; align-items: center; gap: 12px; color: #fff; font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
+    .top-nav .logo .shield { width: 36px; height: 36px; background: var(--bsn-teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .top-nav .nav-right { display: flex; align-items: center; gap: 12px; }
+    .top-nav .role-badge { background: rgba(48,140,131,0.25); color: #a8dfda; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.3px; }
+    .top-nav .switch-view {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.75); font-family: inherit; font-size: 12px; font-weight: 600;
+      padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: var(--transition);
+    }
+    .top-nav .switch-view:hover { background: rgba(255,255,255,0.14); color: #fff; }
+    .dm-toggle { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 5px 10px; cursor: default; }
+    .dm-icon { font-size: 12px; color: rgba(255,255,255,0.55); }
+    .dm-track { width: 28px; height: 14px; background: rgba(255,255,255,0.2); border-radius: 7px; position: relative; }
+    .dm-thumb { width: 10px; height: 10px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; }
+    .top-nav .notif-btn {
+      width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: rgba(255,255,255,0.75); position: relative; font-size: 16px;
+    }
+    .top-nav .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--error-red); border: 1.5px solid var(--bsn-navy); }
+    .top-nav .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bsn-teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+    /* ── APP LAYOUT (matches manager-dashboard) ──── */
+    .app-layout { display: flex; min-height: calc(100vh - 58px); }
+    .sidebar {
+      width: 200px; background: var(--bsn-sidebar);
+      display: flex; flex-direction: column; padding: 20px 12px; gap: 4px; flex-shrink: 0;
+      position: sticky; top: 58px; height: calc(100vh - 58px); overflow-y: auto;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px;
+      color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: var(--transition); position: relative;
+    }
+    .sidebar-item i { font-size: 15px; width: 18px; text-align: center; }
+    .sidebar-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+    .sidebar-item.active { background: rgba(48,140,131,0.15); color: #fff; }
+    .sidebar-item.active::before {
+      content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 24px; background: var(--bsn-teal); border-radius: 0 2px 2px 0;
+    }
+    .sidebar-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin: 8px 0; }
+
+    /* ── MAIN CONTENT ────────────────────────────── */
+    .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+    /* ── PAGE HEADER ────────────────────────────────── */
+    .page-header { padding: 24px 32px 0; }
+    .breadcrumb-bar { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-subtle); margin-bottom: 10px; }
+    .breadcrumb-bar a { color: var(--bsn-teal); cursor: pointer; font-weight: 600; text-decoration: none; }
+    .breadcrumb-bar a:hover { text-decoration: underline; }
+    .breadcrumb-bar .sep { color: #bbb; }
+    .page-title { font-size: 22px; font-weight: 800; color: var(--bsn-navy); }
+    .page-subtitle { font-size: 13px; color: var(--text-primary); margin-top: 3px; font-weight: 500; }
+
+    /* ── TABS ───────────────────────────────────────── */
+    .tab-bar { display: flex; padding: 0 32px; border-bottom: 1px solid #e5e9ee; margin-top: 18px; }
+    .tab-item { padding: 11px 18px; font-size: 13px; font-weight: 600; color: var(--text-subtle); border-bottom: 3px solid transparent; cursor: pointer; margin-bottom: -1px; transition: var(--transition); }
+    .tab-item:hover { color: var(--bsn-navy); }
+    .tab-item.active { color: var(--bsn-navy); border-bottom-color: var(--bsn-teal); }
+    .tab-panel { display: none; padding: 24px 32px; }
+    .tab-panel.active { display: block; }
+
+    /* ── TABLE CARD ─────────────────────────────────── */
+    .table-card { background: var(--card-bg); border-radius: 16px; box-shadow: 0 2px 12px rgba(8,47,73,0.06); overflow: hidden; }
+    .table-toolbar { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #eef1f5; }
+    .toolbar-right { margin-left: auto; display: flex; gap: 8px; }
+
+    .search-box { position: relative; }
+    .search-box i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 14px; pointer-events: none; }
+    .search-box input { border: 1px solid #e5e9ee; border-radius: 8px; padding: 7px 12px 7px 32px; font-family: 'Montserrat', sans-serif; font-size: 13px; outline: none; width: 260px; font-weight: 500; }
+    .search-box input:focus { border-color: var(--bsn-teal); box-shadow: 0 0 0 3px rgba(48,140,131,0.12); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bsn-navy); color: #fff; }
+    th { padding: 11px 20px; font-weight: 600; font-size: 11px; text-align: left; white-space: nowrap; letter-spacing: 0.4px; text-transform: uppercase; }
+    td { padding: 14px 20px; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid #f0f3f6; vertical-align: middle; font-weight: 500; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8fafb; }
+
+    .profile-cell { display: flex; align-items: center; gap: 12px; }
+    .profile-icon { width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .profile-name { font-size: 13px; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 6px; }
+    .profile-desc { font-size: 12px; color: var(--text-primary); margin-top: 1px; }
+    .bsn-badge { background: #dbeafe; color: #1e40af; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; letter-spacing: 0.3px; text-transform: uppercase; white-space: nowrap; }
+    .stat-num { font-size: 15px; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
+    .stat-lbl { font-size: 11px; color: var(--text-primary); }
+
+    /* ── STATUS PILLS ───────────────────────────────── */
+    .pill { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
+    .pill-draft     { background: #f0f0f0; color: #888; }
+    .pill-published { background: #d1fae5; color: #065f46; }
+    .pill-required  { background: #dbeafe; color: #1e40af; }
+    .pill-rec       { background: #fef3c7; color: #92400e; display: inline-flex; align-items: center; gap: 3px; }
+    .pill-rec .material-icons-outlined { font-size: 11px; }
+
+    .award-icons { font-size: 15px; letter-spacing: 1px; }
+    .assign-chips { display: flex; flex-wrap: wrap; gap: 3px; }
+    .chip { background: #f0f0f0; color: var(--text-subtle); font-size: 11px; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
+
+    /* ── ACTION LINKS ───────────────────────────────── */
+    .act { color: var(--bsn-teal); cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: 600; }
+    .act:hover { text-decoration: underline; }
+    .act-del { color: var(--error-red); }
+    .acts { display: flex; gap: 8px; align-items: center; }
+    .sep { color: #ddd; }
+
+    .pg-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid #f0f0f0; }
+    .pg-info { font-size: 12px; color: var(--text-primary); }
+    .pg-btn { padding: 5px 12px; border: 1px solid #ddd; border-radius: 4px; background: #fff; font-size: 12px; cursor: pointer; color: var(--text-primary); }
+    .pg-btn:disabled { color: #ccc; cursor: default; }
+
+    /* ── TOGGLE ─────────────────────────────────────── */
+    .toggle { position: relative; width: 38px; height: 21px; display: inline-block; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; background: #ccc; border-radius: 21px; cursor: pointer; transition: background 0.2s;
+    }
+    .toggle-track::before {
+      content: ''; position: absolute; width: 15px; height: 15px; left: 3px; top: 3px;
+      background: #fff; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked + .toggle-track { background: var(--bsn-teal); }
+    .toggle input:checked + .toggle-track::before { transform: translateX(17px); }
+
+    /* ── BUTTONS ────────────────────────────────────── */
+    .btn {
+      padding: 8px 18px; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px;
+      transition: var(--transition); white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.87; transform: translateY(-1px); }
+    .btn i { font-size: 13px; }
+    .btn-primary { background: var(--bsn-navy); color: #fff; }
+    .btn-teal    { background: var(--bsn-teal); color: #fff; }
+    .btn-outline { background: transparent; color: var(--bsn-navy); border: 2px solid var(--bsn-navy); }
+    .btn-ghost   { background: transparent; color: var(--text-primary); border: 1.5px solid #dde1ea; font-weight: 600; }
+
+    /* ── SLIDE-OUT PANEL ────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    .panel {
+      position: fixed; top: 0; right: -500px; width: 480px; height: 100vh;
+      background: #fff; z-index: 201; box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .panel.open { right: 0; }
+
+    .panel-hd {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 18px 20px 14px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+    }
+    .panel-title { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+    .panel-sub { font-size: 12px; color: var(--text-primary); margin-top: 2px; }
+    .panel-close-btn {
+      width: 28px; height: 28px; border-radius: 6px; border: none;
+      background: var(--card-alt-bg); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; margin-left: 12px;
+    }
+    .panel-close-btn .material-icons-outlined { font-size: 16px; color: #888; }
+    .panel-close-btn:hover { background: #eee; }
+
+    .panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+    .panel-ft { padding: 14px 20px; border-top: 1px solid #f0f0f0; flex-shrink: 0; display: flex; gap: 10px; align-items: center; }
+
+    /* ── WIZARD STEPS ───────────────────────────────── */
+    .steps { display: flex; align-items: flex-start; margin-bottom: 24px; }
+    .step-wrap { display: flex; flex-direction: column; align-items: center; }
+    .step-circle {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid #e0e0e0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #bbb; background: #fff; flex-shrink: 0;
+    }
+    .step-circle.active { border-color: var(--bsn-teal); color: var(--bsn-teal); }
+    .step-circle.done { border-color: var(--bsn-teal); background: var(--bsn-teal); color: #fff; }
+    .step-lbl { font-size: 11px; color: #bbb; margin-top: 4px; white-space: nowrap; }
+    .step-lbl.active { color: var(--bsn-teal); font-weight: 600; }
+    .step-lbl.done { color: var(--text-primary); }
+    .step-line { flex: 1; height: 2px; background: #e0e0e0; margin: 14px 4px 0; }
+    .step-line.done { background: var(--bsn-teal); }
+
+    /* ── FORM ───────────────────────────────────────── */
+    .fg { margin-bottom: 16px; }
+    .fg:last-child { margin-bottom: 0; }
+    .lbl { display: block; font-size: 11px; font-weight: 600; color: var(--text-subtle); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .inp, .sel, .ta {
+      width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 9px 12px;
+      font-family: 'Montserrat', sans-serif; font-size: 14px; color: var(--text-dark); background: #fff;
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .inp:focus, .ta:focus { border-color: var(--bsn-teal); box-shadow: 0 0 0 3px rgba(48,140,131,0.12); }
+    .ta { resize: vertical; min-height: 70px; }
+    .inp-sm { width: 100%; border: 1px solid #e0e0e0; border-radius: 6px; padding: 7px 12px 7px 32px; font-family: 'Montserrat', sans-serif; font-size: 13px; outline: none; }
+    .inp-sm:focus { border-color: var(--bsn-teal); }
+
+    /* ── ICON PICKER ────────────────────────────────── */
+    .icon-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .icon-opt {
+      width: 42px; height: 42px; border-radius: 8px; border: 2px solid #e8e8e8;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .icon-opt:hover { border-color: var(--bsn-teal); background: #f0faf9; }
+    .icon-opt.sel { border-color: var(--bsn-teal); background: #e6f5f4; }
+
+    /* ── CHECK LIST ─────────────────────────────────── */
+    .check-list { border: 1px solid #eee; border-radius: 6px; max-height: 280px; overflow-y: auto; }
+    .check-row {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      border-bottom: 1px solid #f5f5f5; cursor: pointer;
+    }
+    .check-row:last-child { border-bottom: none; }
+    .check-row:hover { background: #fafafa; }
+    .check-row input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--bsn-teal); flex-shrink: 0; }
+    .check-info { flex: 1; min-width: 0; }
+    .check-title { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+    .check-meta  { font-size: 12px; color: var(--text-primary); margin-top: 1px; }
+    .u-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+
+    /* ── EDIT PANEL ITEMS ───────────────────────────── */
+    .edit-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: var(--card-alt-bg); border-radius: 6px; margin-bottom: 6px; border: 1px solid #eee;
+    }
+    .edit-item-info { flex: 1; min-width: 0; }
+    .edit-item-title { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+    .edit-item-sub   { font-size: 12px; color: var(--text-primary); }
+    .rm-btn { background: none; border: none; color: #ccc; cursor: pointer; display: flex; align-items: center; border-radius: 4px; padding: 2px; }
+    .rm-btn:hover { color: var(--error-red); background: #fff0ee; }
+    .rm-btn .material-icons-outlined { font-size: 16px; }
+
+    /* ── CALLOUT ────────────────────────────────────── */
+    .callout {
+      background: #f0f8ff; border: 1px solid #c8e4f7; border-radius: 6px;
+      padding: 10px 14px; font-size: 12px; color: #1e5a8a;
+      display: flex; gap: 8px; align-items: flex-start; margin-bottom: 16px;
+    }
+    .callout .material-icons-outlined { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .callout-lock { background: #f8f8f8; border-color: #e0e0e0; color: #555; }
+
+    /* ── AUTO-ASSIGN ROW ────────────────────────────── */
+    .auto-row {
+      display: flex; align-items: flex-start; gap: 14px; padding: 14px;
+      background: var(--card-alt-bg); border-radius: 8px; border: 1px solid #eee; margin-top: 4px;
+    }
+    .auto-info { flex: 1; }
+    .auto-title { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+    .auto-desc  { font-size: 12px; color: var(--text-primary); margin-top: 2px; }
+
+    /* ── SECTION LABEL ──────────────────────────────── */
+    .sec-lbl {
+      display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600;
+      color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.6px;
+      margin: 18px 0 10px;
+    }
+    .sec-lbl::after { content: ''; flex: 1; height: 1px; background: #eee; }
+
+    .more-label { text-align: center; font-size: 12px; color: var(--text-primary); padding: 8px; }
+
+    .portal-footer { text-align: center; padding: 16px; color: var(--text-primary); font-size: 12px; }
+
+    /* ── TOAST ──────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px;
+      opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; z-index: 500;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast .material-icons-outlined { font-size: 18px; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ TOP NAV ════════════════════════════════════ -->
+  <nav class="top-nav">
+    <div class="logo">
+      <div class="shield"><i class="fas fa-shield-halved"></i></div>
+      <span>BREACH SECURE NOW</span>
+    </div>
+    <div class="nav-right">
+      <div class="dm-toggle">
+        <i class="fa-regular fa-sun dm-icon"></i>
+        <div class="dm-track"><div class="dm-thumb"></div></div>
+        <i class="fa-regular fa-moon dm-icon"></i>
+      </div>
+      <div class="notif-btn">
+        <i class="fa-regular fa-bell"></i>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="avatar">JD</div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+
+    <!-- ═══ SIDEBAR (matches manager-dashboard) ═══════ -->
+    <aside class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='manager-dashboard.html'">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>Training Hub</span>
+      </div>
+      <div class="sidebar-item active">
+        <i class="fa-solid fa-building"></i>
+        <span>My Company</span>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>Manage Clients</span>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>Help Center</span>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN ══════════════════════════════════════ -->
+    <div class="main-content">
+
+      <div class="page-header">
+        <div class="breadcrumb-bar">
+          <a onclick="window.location.href='manager-dashboard.html'">My Company</a>
+          <span class="sep">›</span>
+          <span>Training Configuration</span>
+        </div>
+        <div class="page-title">Training Configuration</div>
+        <div class="page-subtitle">Manage training profiles and learning paths for your team</div>
+      </div>
+
+    <div class="tab-bar">
+      <div class="tab-item active" id="tab-profiles" onclick="switchTab('profiles')">Training Profiles</div>
+      <div class="tab-item" id="tab-paths" onclick="switchTab('paths')">Learning Paths</div>
+    </div>
+
+    <!-- ── TRAINING PROFILES TAB ──────────────────── -->
+    <div class="tab-panel active" id="panel-profiles">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span class="material-icons-outlined">search</span>
+            <input type="text" placeholder="Search profiles…">
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-primary" onclick="openPanel('create')">
+              <span class="material-icons-outlined">add</span>Create Profile
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Learning Paths</th>
+              <th>Users Assigned</th>
+              <th>Auto-Assign New Users</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="profiles-tbody"></tbody>
+        </table>
+        <div class="pg-bar">
+          <span class="pg-info" id="profile-count">5 profiles</span>
+          <div style="display:flex;gap:6px">
+            <button class="pg-btn" disabled>← Prev</button>
+            <button class="pg-btn" disabled>Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LEARNING PATHS TAB ─────────────────────── -->
+    <div class="tab-panel" id="panel-paths">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span class="material-icons-outlined">search</span>
+            <input type="text" placeholder="Search paths…">
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-ghost" onclick="openPanel('assign-path')">
+              <span class="material-icons-outlined">person_add</span>Assign to User
+            </button>
+            <button class="btn btn-primary" onclick="openPanel('create-path')">
+              <span class="material-icons-outlined">add</span>Create New Path
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Path Name</th>
+              <th>Content</th>
+              <th>Status</th>
+              <th>Awards</th>
+              <th>Assigned To</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="paths-tbody"></tbody>
+        </table>
+        <div class="pg-bar">
+          <span class="pg-info">1–5 of 5 paths</span>
+          <div style="display:flex;gap:6px">
+            <button class="pg-btn" disabled>← Prev</button>
+            <button class="pg-btn" disabled>Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="portal-footer">Breach Secure Now! Copyright &copy; 2026</div>
+    </div><!-- end main-content -->
+
+  </div><!-- end app-layout -->
+
+  <!-- ═══ PANEL SYSTEM ════════════════════════════════ -->
+  <div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+  <div class="panel" id="panel">
+    <div class="panel-hd">
+      <div>
+        <div class="panel-title" id="p-title">Panel</div>
+        <div class="panel-sub" id="p-sub"></div>
+      </div>
+      <button class="panel-close-btn" onclick="closePanel()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <div class="panel-body" id="p-body"></div>
+    <div class="panel-ft" id="p-footer"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="material-icons-outlined" id="t-icon">check_circle</span>
+    <span id="t-msg"></span>
+  </div>
+
+<script>
+// ═══ DATA ═══════════════════════════════════════════════
+const PROFILES = [
+  { id:'bsn-ai',    icon:'🤖', bg:'#dbeafe', name:'BSN AI Training Profile',    desc:'AI literacy, safe usage, and responsible AI practices',          bsn:true,  autoAssign:true,
+    paths:['AI Safety & Literacy Essentials','Password Security Fundamentals'],
+    users:['Sarah Johnson','Mike Chen','David Park','Lisa Martinez','Tom Wilson','Amy Lee','Robert Garcia','Emma Davis','James Taylor','Olivia Brown','Noah White','Sophia Harris'] },
+  { id:'bsn-cyber', icon:'🛡️', bg:'#d1fae5', name:'BSN Cybersecurity Profile',  desc:'Full cybersecurity awareness and threat defense curriculum',      bsn:true,  autoAssign:true,
+    paths:['New Employee Security Onboarding','Phishing Defense Certification','Remote Work Security Essentials'],
+    users:['Sarah Johnson','Mike Chen','David Park','Lisa Martinez','Tom Wilson','Amy Lee','Robert Garcia','Emma Davis'] },
+  { id:'bsn-hipaa', icon:'⚕️', bg:'#fef3c7', name:'BSN HIPAA Profile',           desc:'HIPAA compliance and data privacy training',                     bsn:true,  autoAssign:false,
+    paths:['HIPAA Compliance Training','Password Security Fundamentals'],
+    users:['Sarah Johnson','David Park','Lisa Martinez','Robert Garcia','Emma Davis','James Taylor'] },
+  { id:'new-emp',   icon:'🎯', bg:'#f0f9ff', name:'New Employee Onboarding',     desc:'Automatically assigned to all new hires on day one',             bsn:false, autoAssign:true,
+    paths:['New Employee Security Onboarding','HIPAA Compliance Training'],
+    users:['Olivia Brown','Noah White','Sophia Harris','Lucas Jones','Mia Garcia','Ethan Wilson','Charlotte Lee','Aiden Martinez','Harper Davis','Elijah Chen','Avery Taylor','Mason Brown','Isabella Johnson','Logan White'] },
+  { id:'it-adv',    icon:'💻', bg:'#fdf4ff', name:'IT Department Advanced',      desc:'Advanced threat response and technical security for IT staff',    bsn:false, autoAssign:false,
+    paths:['Phishing Defense Certification','AI Safety & Literacy Essentials','Remote Work Security Essentials'],
+    users:['Mike Chen','Tom Wilson','Amy Lee'] },
+];
+
+const PATHS = [
+  { id:'p1', title:'New Employee Security Onboarding', items:'17 items', counts:'5·8·4', status:'required',  awards:'🏅 📜 ⭐', rec:true,  profiles:['New Employee Onboarding','BSN Cybersecurity'],  extraUsers:2 },
+  { id:'p2', title:'HIPAA Compliance Training',        items:'10 items', counts:'3·5·2', status:'required',  awards:'📜 ⭐',    rec:false, profiles:['BSN HIPAA','New Employee Onboarding'],          extraUsers:0 },
+  { id:'p3', title:'Phishing Defense Certification',   items:'11 items', counts:'2·6·3', status:'published', awards:'🏅 📜',    rec:false, profiles:['BSN Cybersecurity','IT Advanced'],              extraUsers:0 },
+  { id:'p4', title:'AI Safety & Literacy Essentials',  items:'8 items',  counts:'3·3·2', status:'published', awards:'🏅 🤖',    rec:false, profiles:['BSN AI Training'],                             extraUsers:1 },
+  { id:'p5', title:'Remote Work Security Essentials',  items:'12 items', counts:'2·4·6', status:'draft',     awards:'⭐ 🤖',    rec:false, profiles:[],                                              extraUsers:0 },
+];
+
+const USERS = [
+  { name:'Sarah Johnson',  email:'sjohnson@company.com',  color:'#4184b5' },
+  { name:'Mike Chen',      email:'mchen@company.com',     color:'#0cce6b' },
+  { name:'David Park',     email:'dpark@company.com',     color:'#f39c12' },
+  { name:'Lisa Martinez',  email:'lmartinez@company.com', color:'#e74c3c' },
+  { name:'Tom Wilson',     email:'twilson@company.com',   color:'#9b59b6' },
+  { name:'Amy Lee',        email:'alee@company.com',      color:'#1abc9c' },
+  { name:'Robert Garcia',  email:'rgarcia@company.com',   color:'#e67e22' },
+  { name:'Emma Davis',     email:'edavis@company.com',    color:'#3498db' },
+  { name:'James Taylor',   email:'jtaylor@company.com',   color:'#2ecc71' },
+  { name:'Olivia Brown',   email:'obrown@company.com',    color:'#e91e63' },
+  { name:'Noah White',     email:'nwhite@company.com',    color:'#00bcd4' },
+  { name:'Sophia Harris',  email:'sharris@company.com',   color:'#ff5722' },
+];
+
+// ═══ STATE ══════════════════════════════════════════════
+let profiles = PROFILES.map(p => ({ ...p, paths:[...p.paths], users:[...p.users] }));
+let mode = null, wStep = 1, editId = null, assignPath = null;
+let newProf = {};
+
+// ═══ INIT ════════════════════════════════════════════════
+function init() { renderProfiles(); renderPaths(); }
+
+// ═══ TABS ════════════════════════════════════════════════
+function switchTab(t) {
+  ['profiles','paths'].forEach(x => {
+    document.getElementById('tab-'+x).classList.toggle('active', x===t);
+    document.getElementById('panel-'+x).classList.toggle('active', x===t);
+  });
+}
+
+// ═══ RENDER PROFILES TABLE ═══════════════════════════════
+function renderProfiles() {
+  const tbody = document.getElementById('profiles-tbody');
+  document.getElementById('profile-count').textContent = profiles.length + ' profiles';
+  tbody.innerHTML = profiles.map(p => {
+    const actions = [
+      '<span class="act" data-pid="'+p.id+'" onclick="editProfile(this.dataset.pid)">Edit</span>',
+      '<span class="sep">·</span>',
+      '<span class="act" data-pid="'+p.id+'" onclick="assignUsers(this.dataset.pid)">Assign Users</span>',
+      p.bsn ? '' : '<span class="sep">·</span><span class="act act-del" data-pid="'+p.id+'" onclick="deleteProfile(this.dataset.pid)">Delete</span>'
+    ].join('');
+    return '<tr>'
+      + '<td><div class="profile-cell">'
+      +   '<div class="profile-icon" style="background:'+p.bg+'">'+p.icon+'</div>'
+      +   '<div>'
+      +     '<div class="profile-name">'+escHtml(p.name)+(p.bsn ? ' <span class="bsn-badge">BSN Built-in</span>' : '')+'</div>'
+      +     '<div class="profile-desc">'+escHtml(p.desc)+'</div>'
+      +   '</div>'
+      + '</div></td>'
+      + '<td><div class="stat-num">'+p.paths.length+'</div><div class="stat-lbl">path'+(p.paths.length!==1?'s':'')+'</div></td>'
+      + '<td><div class="stat-num">'+p.users.length+'</div><div class="stat-lbl">user'+(p.users.length!==1?'s':'')+'</div></td>'
+      + '<td><label class="toggle"><input type="checkbox"'+(p.autoAssign?' checked':'')+' data-pid="'+p.id+'" onchange="toggleAuto(this.dataset.pid,this.checked)"><span class="toggle-track"></span></label></td>'
+      + '<td><div class="acts">'+actions+'</div></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// ═══ RENDER PATHS TABLE ══════════════════════════════════
+function renderPaths() {
+  const tbody = document.getElementById('paths-tbody');
+  tbody.innerHTML = PATHS.map(p => {
+    const assigns = p.profiles.map(x => '<span class="chip">'+escHtml(x)+'</span>').join('');
+    const extra   = p.extraUsers ? '<div style="font-size:11px;color:var(--text-primary);margin-top:3px">+'+p.extraUsers+' individual</div>' : '';
+    const noAssign = !p.profiles.length && !p.extraUsers ? '<span style="color:#ccc;font-size:12px">Not assigned</span>' : '';
+    return '<tr style="cursor:pointer" data-pid="'+p.id+'" onclick="viewPath(this.dataset.pid)">'
+      + '<td>'
+      +   '<div style="font-weight:600;color:var(--bsn-teal)">'+escHtml(p.title)+'</div>'
+      +   (p.rec ? '<div style="margin-top:3px"><span class="pill pill-rec"><span class="material-icons-outlined">star</span>Recommended</span></div>' : '')
+      + '</td>'
+      + '<td><span style="font-weight:600;color:var(--text-dark)">'+escHtml(p.items)+'</span><span style="color:#bbb;font-size:11px"> ('+p.counts+')</span></td>'
+      + '<td><span class="pill pill-'+p.status+'">'+p.status+'</span></td>'
+      + '<td><div class="award-icons">'+p.awards+'</div></td>'
+      + '<td><div class="assign-chips">'+assigns+'</div>'+extra+noAssign+'</td>'
+      + '<td><div class="acts" onclick="event.stopPropagation()">'
+      +   '<span class="act" data-pid="'+p.id+'" onclick="viewPath(this.dataset.pid)">View</span>'
+      +   ' <span class="sep">·</span> '
+      +   '<span class="act" data-pid="'+p.id+'" data-ptitle="'+escAttr(p.title)+'" onclick="openAssignPath(this.dataset.pid,this.dataset.ptitle)">Assign</span>'
+      +   ' <span class="sep">·</span> <span class="act act-del">Delete</span>'
+      + '</div></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// ═══ PATH ACTIONS ═══════════════════════════════════════
+function viewPath(id) { openPanel('view-path', id); }
+
+// ═══ PROFILE ACTIONS ════════════════════════════════════
+function toggleAuto(id, val) { const p=profiles.find(x=>x.id===id); if(p) p.autoAssign=val; }
+
+function deleteProfile(id) {
+  const p = profiles.find(x=>x.id===id);
+  if (!p || p.bsn) return;
+  if (!confirm('Delete "'+p.name+'"?')) return;
+  profiles = profiles.filter(x=>x.id!==id);
+  renderProfiles();
+  showToast('"'+p.name+'" deleted', '#e74c3c', 'delete');
+}
+
+function editProfile(id) { openPanel('edit', id); }
+function assignUsers(id) { openPanel('assign-users', id); }
+function openAssignPath(id, title) { openPanel('assign-path', { id, title }); }
+
+// ═══ PANEL OPEN / CLOSE ══════════════════════════════════
+function openPanel(m, data) {
+  mode = m;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+  if (m==='create')       { wStep=1; newProf={name:'',desc:'',icon:'🎯',bg:'#f0f9ff',paths:[],users:[],autoAssign:true}; drawCreate(); }
+  else if (m==='edit')    { editId=data; drawEdit(data); }
+  else if (m==='assign-users') { editId=data; drawAssignUsers(data); }
+  else if (m==='assign-path')  { assignPath=data||{id:'p1',title:'Learning Path'}; drawAssignPath(); }
+  else if (m==='view-path')    { editId=data; drawPathDetail(data); }
+  else if (m==='create-path') { lpStep=1; newPath={name:'',desc:'',status:'draft',rec:false,content:[],badge:false,badgeName:'',badgeIcon:'🏅',cert:false,points:false,pointsVal:100}; drawCreatePath(); }
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+}
+
+// ═══ CREATE WIZARD ═══════════════════════════════════════
+function drawCreate() {
+  const s = wStep;
+  document.getElementById('p-title').textContent = 'Create Training Profile';
+  document.getElementById('p-sub').textContent = 'Step '+s+' of 3 — '+['Profile Details','Add Learning Paths','Assign Users'][s-1];
+
+  const sc = n => n<s?'done':n===s?'active':'';
+  document.getElementById('p-body').innerHTML =
+    '<div class="steps">'
+      +'<div class="step-wrap"><div class="step-circle '+sc(1)+'">'+(s>1?'✓':'1')+'</div><div class="step-lbl '+sc(1)+'">Details</div></div>'
+      +'<div class="step-line '+(s>1?'done':'')+'"></div>'
+      +'<div class="step-wrap"><div class="step-circle '+sc(2)+'">'+(s>2?'✓':'2')+'</div><div class="step-lbl '+sc(2)+'">Paths</div></div>'
+      +'<div class="step-line '+(s>2?'done':'')+'"></div>'
+      +'<div class="step-wrap"><div class="step-circle '+sc(3)+'">3</div><div class="step-lbl '+sc(3)+'">Users</div></div>'
+    +'</div>'
+    +(s===1?drawStep1():s===2?drawStep2():drawStep3());
+
+  document.getElementById('p-footer').innerHTML =
+    (s>1 ? '<button class="btn btn-ghost" onclick="wBack()">← Back</button>' : '<button class="btn btn-ghost" onclick="closePanel()">Cancel</button>')
+    +'<div style="flex:1"></div>'
+    +(s<3
+      ? '<button class="btn btn-primary" onclick="wNext()">Continue <span class="material-icons-outlined" style="font-size:14px">arrow_forward</span></button>'
+      : '<button class="btn btn-teal" onclick="createFinal()"><span class="material-icons-outlined" style="font-size:14px">check</span> Create Profile</button>');
+}
+
+function drawStep1() {
+  const icons = ['🎯','🔵','🟢','🟠','💡','🔒','🏢','👥'];
+  return '<div class="fg"><div class="lbl">Profile Name</div>'
+    +'<input class="inp" id="np-name" placeholder="e.g., IT Department Advanced" value="'+escAttr(newProf.name)+'" oninput="newProf.name=this.value"></div>'
+    +'<div class="fg"><div class="lbl">Description</div>'
+    +'<textarea class="ta" id="np-desc" placeholder="Describe who this profile is for…" oninput="newProf.desc=this.value">'+escHtml(newProf.desc)+'</textarea></div>'
+    +'<div class="fg"><div class="lbl">Icon</div><div class="icon-grid">'
+    +icons.map(ic=>'<div class="icon-opt'+(newProf.icon===ic?' sel':'')+'" data-icon="'+ic+'" onclick="pickIcon(this)">'+ic+'</div>').join('')
+    +'</div></div>'
+    +'<div class="auto-row">'
+    +'<div class="auto-info"><div class="auto-title">Auto-assign to new users</div><div class="auto-desc">Apply this profile automatically when new employees are added</div></div>'
+    +'<label class="toggle"><input type="checkbox" id="np-auto"'+(newProf.autoAssign?' checked':'')+' onchange="newProf.autoAssign=this.checked"><span class="toggle-track"></span></label>'
+    +'</div>';
+}
+
+function drawStep2() {
+  return '<div class="callout"><span class="material-icons-outlined">info</span>Select the learning paths to include. Assigned employees will see all selected paths in their queue.</div>'
+    +'<div class="fg"><div class="lbl">Available Learning Paths</div>'
+    +'<div class="check-list">'
+    +PATHS.map(p=>'<label class="check-row"><input type="checkbox"'+(newProf.paths.includes(p.id)?' checked':'')+' data-pid="'+p.id+'" onchange="togglePath(this.dataset.pid,this.checked)">'
+      +'<div class="check-info"><div class="check-title">'+escHtml(p.title)+'</div><div class="check-meta">'+p.items+' · '+p.status+'</div></div>'
+      +'<span class="pill pill-'+p.status+'" style="font-size:10px">'+p.status+'</span>'
+      +'</label>').join('')
+    +'</div></div>'
+    +'<div id="path-count-lbl" style="font-size:12px;color:var(--text-primary);margin-top:8px">'+newProf.paths.length+' path'+(newProf.paths.length!==1?'s':'')+' selected</div>';
+}
+
+function drawStep3() {
+  return '<div class="callout"><span class="material-icons-outlined">info</span>Assign users now or skip — you can always assign later from the profiles table.</div>'
+    +'<div class="fg"><div class="lbl">Search Users</div>'
+    +'<div class="search-box" style="margin-bottom:10px"><span class="material-icons-outlined">search</span>'
+    +'<input class="inp-sm" placeholder="Search by name or email…" oninput="filterWizUsers(this.value)"></div>'
+    +'<div class="check-list" id="wiz-users">'+drawUserChecks(newProf.users)+'</div></div>'
+    +'<div id="user-count-lbl" style="font-size:12px;color:var(--text-primary);margin-top:8px">'+newProf.users.length+' user'+(newProf.users.length!==1?'s':'')+' selected</div>';
+}
+
+function drawUserChecks(selected, filter='') {
+  return USERS.filter(u=>!filter||u.name.toLowerCase().includes(filter.toLowerCase())||u.email.toLowerCase().includes(filter.toLowerCase()))
+    .map(u=>'<label class="check-row"><input type="checkbox"'+(selected.includes(u.name)?' checked':'')+' data-uname="'+escAttr(u.name)+'" onchange="toggleWizUser(this.dataset.uname,this.checked)">'
+      +'<div class="u-avatar" style="background:'+u.color+'">'+u.name.split(' ').map(w=>w[0]).join('')+'</div>'
+      +'<div class="check-info"><div class="check-title">'+escHtml(u.name)+'</div><div class="check-meta">'+u.email+'</div></div>'
+      +'</label>').join('');
+}
+
+function pickIcon(el) {
+  newProf.icon = el.dataset.icon;
+  document.querySelectorAll('.icon-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function togglePath(id, checked) {
+  if (checked) { if (!newProf.paths.includes(id)) newProf.paths.push(id); }
+  else newProf.paths = newProf.paths.filter(x=>x!==id);
+  const el = document.getElementById('path-count-lbl');
+  if (el) el.textContent = newProf.paths.length+' path'+(newProf.paths.length!==1?'s':'')+' selected';
+}
+function toggleWizUser(name, checked) {
+  if (checked) { if (!newProf.users.includes(name)) newProf.users.push(name); }
+  else newProf.users = newProf.users.filter(x=>x!==name);
+  const el = document.getElementById('user-count-lbl');
+  if (el) el.textContent = newProf.users.length+' user'+(newProf.users.length!==1?'s':'')+' selected';
+}
+function filterWizUsers(q) {
+  const el = document.getElementById('wiz-users');
+  if (el) el.innerHTML = drawUserChecks(newProf.users, q);
+}
+function wNext() {
+  if (wStep===1) {
+    const name = (document.getElementById('np-name')||{}).value || '';
+    if (!name.trim()) { showToast('Please enter a profile name','#e74c3c','error_outline'); return; }
+    newProf.name = name.trim();
+    newProf.desc = (document.getElementById('np-desc')||{}).value || '';
+  }
+  wStep++; drawCreate();
+}
+function wBack() { wStep--; drawCreate(); }
+
+function createFinal() {
+  const id = 'c'+Date.now();
+  profiles.push({ id, icon:newProf.icon, bg:'#f0f9ff', name:newProf.name,
+    desc:newProf.desc||'Custom training profile', bsn:false,
+    paths:newProf.paths.map(pid=>{ const p=PATHS.find(x=>x.id===pid); return p?p.title:pid; }),
+    users:[...newProf.users], autoAssign:newProf.autoAssign });
+  renderProfiles(); closePanel();
+  showToast('"'+newProf.name+'" created!','#0cce6b','check_circle');
+}
+
+// ═══ EDIT PANEL ══════════════════════════════════════════
+function drawEdit(id) {
+  const p = profiles.find(x=>x.id===id);
+  if (!p) return;
+  document.getElementById('p-title').textContent = 'Edit Profile';
+  document.getElementById('p-sub').textContent = p.name;
+
+  let html = p.bsn
+    ? '<div class="callout callout-lock"><span class="material-icons-outlined">lock</span>BSN built-in profiles have fixed names, but you can add or remove learning paths and manage user assignments.</div>'
+    : '';
+
+  html += '<div class="fg"><div class="lbl">Profile Name</div>'
+    +'<input class="inp" value="'+escAttr(p.name)+'"'+(p.bsn?' disabled style="background:#f8f8f8;color:#aaa"':'')+' id="edit-name"></div>'
+    +'<div class="fg"><div class="lbl">Description</div>'
+    +'<textarea class="ta"'+(p.bsn?' disabled style="background:#f8f8f8;color:#aaa"':'')+'>'+escHtml(p.desc)+'</textarea></div>';
+
+  html += '<div class="sec-lbl">Learning Paths</div>';
+  html += p.paths.map(path =>
+    '<div class="edit-item">'
+    +'<div class="edit-item-info"><div class="edit-item-title">'+escHtml(path)+'</div></div>'
+    +'<button class="rm-btn" data-pid="'+escAttr(id)+'" data-path="'+escAttr(path)+'" onclick="rmPath(this.dataset.pid,this.dataset.path)">'
+    +'<span class="material-icons-outlined">close</span></button>'
+    +'</div>'
+  ).join('');
+  html += '<button class="btn btn-ghost" style="margin-top:10px;width:100%;justify-content:center" onclick="closePanel();openPanel(\'create\')">'
+    +'<span class="material-icons-outlined">add</span>Add Path</button>';
+
+  html += '<div class="sec-lbl" style="margin-top:20px">Assigned Users ('+p.users.length+')</div>';
+  const shown = p.users.slice(0,6);
+  html += shown.map(name => {
+    const u = USERS.find(x=>x.name===name)||{name,color:'#888'};
+    const initials = name.split(' ').map(w=>w[0]).join('');
+    return '<div class="edit-item">'
+      +'<div class="u-avatar" style="background:'+u.color+';width:28px;height:28px;font-size:11px;flex-shrink:0">'+initials+'</div>'
+      +'<div class="edit-item-info"><div class="edit-item-title">'+escHtml(name)+'</div></div>'
+      +'<button class="rm-btn" data-pid="'+escAttr(id)+'" data-uname="'+escAttr(name)+'" onclick="rmUser(this.dataset.pid,this.dataset.uname)">'
+      +'<span class="material-icons-outlined">close</span></button>'
+      +'</div>';
+  }).join('');
+  if (p.users.length > 6) html += '<div class="more-label">+' + (p.users.length-6) + ' more users</div>';
+  html += '<button class="btn btn-ghost" style="margin-top:10px;width:100%;justify-content:center" data-pid="'+escAttr(id)+'" onclick="closePanel();openPanel(\'assign-users\',this.dataset.pid)">'
+    +'<span class="material-icons-outlined">person_add</span>Add Users</button>';
+
+  document.getElementById('p-body').innerHTML = html;
+  document.getElementById('p-footer').innerHTML =
+    '<button class="btn btn-ghost" onclick="closePanel()">Cancel</button><div style="flex:1"></div>'
+    +'<button class="btn btn-primary" data-pid="'+escAttr(id)+'" onclick="saveEdit(this.dataset.pid)">Save Changes</button>';
+}
+
+function rmPath(id, path) {
+  const p = profiles.find(x=>x.id===id); if(!p) return;
+  p.paths = p.paths.filter(x=>x!==path); drawEdit(id);
+}
+function rmUser(id, name) {
+  const p = profiles.find(x=>x.id===id); if(!p) return;
+  p.users = p.users.filter(x=>x!==name); drawEdit(id);
+}
+function saveEdit(id) {
+  const nameEl = document.getElementById('edit-name');
+  const p = profiles.find(x=>x.id===id);
+  if (p && nameEl && !p.bsn) p.name = nameEl.value.trim()||p.name;
+  renderProfiles(); closePanel();
+  showToast('"'+(p?p.name:'Profile')+'" updated','#082f49','save');
+}
+
+// ═══ ASSIGN USERS PANEL ══════════════════════════════════
+function drawAssignUsers(id) {
+  const p = profiles.find(x=>x.id===id); if(!p) return;
+  document.getElementById('p-title').textContent = 'Assign Users';
+  document.getElementById('p-sub').textContent = p.name;
+
+  document.getElementById('p-body').innerHTML =
+    '<div class="callout"><span class="material-icons-outlined">info</span>'
+    +'Users assigned here will receive all learning paths in this profile. Currently <strong>'+p.users.length+' users</strong> assigned.</div>'
+    +'<div class="search-box" style="margin-bottom:10px"><span class="material-icons-outlined">search</span>'
+    +'<input class="inp-sm" placeholder="Search users…" data-pid="'+escAttr(id)+'" oninput="filterAssign(this.dataset.pid,this.value)"></div>'
+    +'<div class="check-list" id="assign-list">'+drawAssignList(p)+'</div>'
+    +'<div id="assign-count" style="font-size:12px;color:var(--text-primary);margin-top:8px">'+p.users.length+' users selected</div>';
+
+  document.getElementById('p-footer').innerHTML =
+    '<button class="btn btn-ghost" onclick="closePanel()">Cancel</button><div style="flex:1"></div>'
+    +'<button class="btn btn-primary" data-pid="'+escAttr(id)+'" onclick="saveAssign(this.dataset.pid)">Save Assignments</button>';
+}
+
+function drawAssignList(p, filter='') {
+  return USERS.filter(u=>!filter||u.name.toLowerCase().includes(filter.toLowerCase()))
+    .map(u=>'<label class="check-row"><input type="checkbox"'+(p.users.includes(u.name)?' checked':'')+' data-pid="'+escAttr(p.id)+'" data-uname="'+escAttr(u.name)+'" onchange="toggleAssignUser(this.dataset.pid,this.dataset.uname,this.checked)">'
+      +'<div class="u-avatar" style="background:'+u.color+'">'+u.name.split(' ').map(w=>w[0]).join('')+'</div>'
+      +'<div class="check-info"><div class="check-title">'+escHtml(u.name)+'</div><div class="check-meta">'+u.email+'</div></div>'
+      +'</label>').join('');
+}
+
+function toggleAssignUser(id, name, checked) {
+  const p = profiles.find(x=>x.id===id); if(!p) return;
+  if (checked) { if (!p.users.includes(name)) p.users.push(name); }
+  else p.users = p.users.filter(x=>x!==name);
+  const el = document.getElementById('assign-count');
+  if (el) el.textContent = p.users.length+' users selected';
+}
+function filterAssign(id, q) {
+  const p = profiles.find(x=>x.id===id); if(!p) return;
+  const el = document.getElementById('assign-list');
+  if (el) el.innerHTML = drawAssignList(p, q);
+}
+function saveAssign(id) {
+  renderProfiles(); closePanel();
+  const p = profiles.find(x=>x.id===id);
+  showToast('Users updated for "'+(p?p.name:'profile')+'"','#082f49','people');
+}
+
+// ═══ ASSIGN PATH TO USER PANEL ═══════════════════════════
+function drawAssignPath() {
+  const path = assignPath;
+  document.getElementById('p-title').textContent = 'Assign Path to User';
+  document.getElementById('p-sub').textContent = path ? path.title : '';
+
+  document.getElementById('p-body').innerHTML =
+    '<div class="callout callout-warn"><span class="material-icons-outlined">info</span>'
+    +'This is a one-off assignment — it won\'t affect training profiles. Use profiles to manage assignments at scale.</div>'
+    +'<div class="edit-item" style="margin-bottom:16px">'
+    +'<span class="material-icons-outlined" style="color:var(--accent-teal);font-size:20px">route</span>'
+    +'<div class="edit-item-info"><div class="lbl" style="margin-bottom:0">Learning Path</div>'
+    +'<div class="edit-item-title">'+(path?escHtml(path.title):'')+'</div></div></div>'
+    +'<div class="lbl">Select Users</div>'
+    +'<div class="search-box" style="margin-bottom:10px"><span class="material-icons-outlined">search</span>'
+    +'<input class="inp-sm" placeholder="Search users…"></div>'
+    +'<div class="check-list">'
+    +USERS.map(u=>'<label class="check-row"><input type="checkbox">'
+      +'<div class="u-avatar" style="background:'+u.color+'">'+u.name.split(' ').map(w=>w[0]).join('')+'</div>'
+      +'<div class="check-info"><div class="check-title">'+escHtml(u.name)+'</div><div class="check-meta">'+u.email+'</div></div>'
+      +'</label>').join('')
+    +'</div>';
+
+  document.getElementById('p-footer').innerHTML =
+    '<button class="btn btn-ghost" onclick="closePanel()">Cancel</button><div style="flex:1"></div>'
+    +'<button class="btn btn-primary" onclick="confirmAssignPath()">'
+    +'<span class="material-icons-outlined" style="font-size:14px">send</span>Assign Path</button>';
+}
+
+function confirmAssignPath() {
+  closePanel();
+  showToast('"'+(assignPath?escHtml(assignPath.title):'Path')+'" assigned','#082f49','check_circle');
+}
+
+// ═══ PATH DETAIL PANEL ═══════════════════════════════════
+function drawPathDetail(id) {
+  const p = PATHS.find(x=>x.id===id); if(!p) return;
+  const awardMap = { '🏅':'Badge', '📜':'Certificate', '⭐':'ESS Points', '🤖':'AI Points' };
+  const awardList = p.awards.split(' ').filter(Boolean);
+  const [courses, micros, nanos] = p.counts.split('·').map(x=>x.trim());
+
+  document.getElementById('p-title').textContent = p.title;
+  document.getElementById('p-sub').textContent = p.items + ' · ' + p.status;
+
+  let html = '';
+
+  // Status + recommended badges
+  html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:20px">';
+  html += '<span class="pill pill-'+p.status+'">'+p.status+'</span>';
+  if (p.rec) html += '<span class="pill pill-rec"><span class="material-icons-outlined">star</span>Recommended</span>';
+  html += '</div>';
+
+  // Content breakdown
+  html += '<div class="sec-lbl">Content Breakdown</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">';
+  [['Courses', courses, 'school'], ['Micro Trainings', micros, 'bolt'], ['Nanos', nanos, 'flash_on']].forEach(([label, count, icon]) => {
+    html += '<div style="background:#f4f7f9;border-radius:12px;padding:14px 10px;text-align:center">'
+      + '<span class="material-icons-outlined" style="font-size:18px;color:var(--bsn-teal);display:block;margin-bottom:4px">'+icon+'</span>'
+      + '<div style="font-size:22px;font-weight:700;color:var(--bsn-navy);line-height:1">'+count+'</div>'
+      + '<div style="font-size:10px;color:var(--text-subtle);font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:0.4px">'+label+'</div>'
+      + '</div>';
+  });
+  html += '</div>';
+
+  // Awards on completion
+  if (awardList.length) {
+    html += '<div class="sec-lbl">Awards on Completion</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">';
+    awardList.forEach(aw => {
+      const label = awardMap[aw] || aw;
+      html += '<div style="display:flex;align-items:center;gap:8px;background:#f4f7f9;border-radius:10px;padding:10px 14px">'
+        + '<span style="font-size:20px">'+aw+'</span>'
+        + '<span style="font-size:12px;font-weight:600;color:var(--text-dark)">'+label+'</span>'
+        + '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Assigned to profiles
+  html += '<div class="sec-lbl">Assigned to Profiles</div>';
+  if (p.profiles.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">';
+    p.profiles.forEach(pr => { html += '<span class="chip">'+escHtml(pr)+'</span>'; });
+    html += '</div>';
+    if (p.extraUsers) {
+      html += '<div style="font-size:12px;color:var(--text-primary);margin-bottom:16px">+'+p.extraUsers+' individual assignment'+(p.extraUsers!==1?'s':'')+'</div>';
+    } else {
+      html += '<div style="margin-bottom:16px"></div>';
+    }
+  } else {
+    html += '<div style="color:#bbb;font-size:13px;margin-bottom:16px;font-style:italic">Not assigned to any profile yet. Use the Assign button to add users.</div>';
+  }
+
+  document.getElementById('p-body').innerHTML = html;
+  const safeId    = escAttr(id);
+  const safeTitle = escAttr(p.title);
+  document.getElementById('p-footer').innerHTML =
+    '<button class="btn btn-ghost" onclick="closePanel()">Close</button>'
+    +'<div style="flex:1"></div>'
+    +'<button class="btn btn-ghost" data-pid="'+safeId+'" data-ptitle="'+safeTitle+'" onclick="var pid=this.dataset.pid,pt=this.dataset.ptitle;closePanel();setTimeout(function(){openAssignPath(pid,pt);},200)">Assign to User</button>'
+    +'<button class="btn btn-primary" onclick="closePanel();setTimeout(function(){openPanel(\'create-path\');},200)">'
+    +'<span class="material-icons-outlined" style="font-size:14px">edit</span>Edit Path</button>';
+}
+
+// ═══ CREATE LEARNING PATH WIZARD ════════════════════════
+const LP_CONTENT = {
+  courses: [
+    { id:'lc1', title:'Cybersecurity Fundamentals',           dur:45, type:'course' },
+    { id:'lc2', title:'Phishing Prevention & Email Security', dur:30, type:'course' },
+    { id:'lc3', title:'Password Management Best Practices',   dur:20, type:'course' },
+    { id:'lc4', title:'Data Privacy & HIPAA Compliance',      dur:60, type:'course' },
+    { id:'lc5', title:'Social Engineering Awareness',         dur:35, type:'course' },
+    { id:'lc6', title:'Remote Work Security',                 dur:25, type:'course' },
+    { id:'lc7', title:'Incident Response Basics',             dur:40, type:'course' },
+  ],
+  micro: [
+    { id:'lm1', title:'Spotting a Phishing Email',        dur:5,  type:'micro' },
+    { id:'lm2', title:'Creating Strong Passwords',        dur:3,  type:'micro' },
+    { id:'lm3', title:'Safe Web Browsing Tips',           dur:4,  type:'micro' },
+    { id:'lm4', title:'Securing Your Home Office',        dur:6,  type:'micro' },
+    { id:'lm5', title:'Recognizing Ransomware',           dur:5,  type:'micro' },
+    { id:'lm6', title:'Two-Factor Authentication Setup',  dur:4,  type:'micro' },
+    { id:'lm7', title:'Reporting a Security Incident',    dur:3,  type:'micro' },
+  ],
+  nanos: [
+    { id:'ln1', title:"What is Phishing?",         dur:1, type:'nano' },
+    { id:'ln2', title:"Password Do's and Don'ts",  dur:1, type:'nano' },
+    { id:'ln3', title:'Lock Your Screen',           dur:1, type:'nano' },
+    { id:'ln4', title:'Secure File Sharing',        dur:1, type:'nano' },
+    { id:'ln5', title:'VPN Basics',                 dur:2, type:'nano' },
+    { id:'ln6', title:'USB Safety',                 dur:1, type:'nano' },
+    { id:'ln7', title:'Social Media Security',      dur:2, type:'nano' },
+  ]
+};
+let lpStep = 1;
+let newPath = {};
+let lpContentTab = 'courses';
+let lpContentFilter = '';
+
+function durStr(m) { return m < 60 ? m+' min' : Math.floor(m/60)+'h'+(m%60?(' '+m%60+'m'):''); }
+function lpTypeChip(t) {
+  const map = {course:'#dbeafe:#1e40af:Course', micro:'#d1fae5:#065f46:Micro', nano:'#f5f3ff:#5b21b6:Nano'};
+  const [bg,cl,lbl] = (map[t]||'#f3f4f6:#374151:?').split(':');
+  return '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:'+bg+';color:'+cl+'">'+lbl+'</span>';
+}
+
+function drawCreatePath() {
+  const s = lpStep;
+  document.getElementById('p-title').textContent = 'Create Learning Path';
+  document.getElementById('p-sub').textContent   = 'Step '+s+' of 3 — '+['Path Details','Add Content','Awards & Settings'][s-1];
+  const sc = n => n<s?'done':n===s?'active':'';
+  document.getElementById('p-body').innerHTML =
+    '<div class="steps">'
+      +'<div class="step-wrap"><div class="step-circle '+sc(1)+'">'+(s>1?'✓':'1')+'</div><div class="step-lbl '+sc(1)+'">Details</div></div>'
+      +'<div class="step-line '+(s>1?'done':'')+'"></div>'
+      +'<div class="step-wrap"><div class="step-circle '+sc(2)+'">'+(s>2?'✓':'2')+'</div><div class="step-lbl '+sc(2)+'">Content</div></div>'
+      +'<div class="step-line '+(s>2?'done':'')+'"></div>'
+      +'<div class="step-wrap"><div class="step-circle '+sc(3)+'">3</div><div class="step-lbl '+sc(3)+'">Awards</div></div>'
+    +'</div>'
+    +(s===1?drawLPStep1():s===2?drawLPStep2():drawLPStep3());
+  document.getElementById('p-footer').innerHTML =
+    (s>1 ? '<button class="btn btn-ghost" onclick="lpBack()">← Back</button>' : '<button class="btn btn-ghost" onclick="closePanel()">Cancel</button>')
+    +'<div style="flex:1"></div>'
+    +(s<3
+      ? '<button class="btn btn-primary" onclick="lpNext()">Continue <span class="material-icons-outlined" style="font-size:14px">arrow_forward</span></button>'
+      : '<button class="btn btn-teal" onclick="lpCreate()"><span class="material-icons-outlined" style="font-size:14px">check</span> Create Path</button>');
+}
+
+function drawLPStep1() {
+  return '<div class="fg"><div class="lbl">Path Name</div>'
+    +'<input class="inp" id="lp-name" placeholder="e.g., New Employee Security Onboarding" value="'+escAttr(newPath.name)+'" oninput="newPath.name=this.value"></div>'
+    +'<div class="fg"><div class="lbl">Description</div>'
+    +'<textarea class="ta" id="lp-desc" placeholder="Describe what employees will learn and why this path matters…" oninput="newPath.desc=this.value" style="min-height:80px">'+escHtml(newPath.desc)+'</textarea></div>'
+    +'<div class="fg"><div class="lbl">Status</div>'
+    +'<select class="sel" id="lp-status" onchange="newPath.status=this.value">'
+      +'<option value="draft"'+(newPath.status==='draft'?' selected':'')+'>Draft — Not visible to employees</option>'
+      +'<option value="published"'+(newPath.status==='published'?' selected':'')+'>Published — Visible in employee library</option>'
+      +'<option value="required"'+(newPath.status==='required'?' selected':'')+'>Required — Appears in My Assignments</option>'
+    +'</select></div>'
+    +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc;border:1px solid #e8ecf0;border-radius:8px;cursor:pointer" onclick="newPath.rec=!newPath.rec;drawCreatePath()">'
+      +'<span class="material-icons-outlined" style="color:'+(newPath.rec?'#f59e0b':'#bbb')+';font-size:20px">'+(newPath.rec?'star':'star_border')+'</span>'
+      +'<div style="flex:1">'
+        +'<div style="font-size:13px;font-weight:600;color:#1e293b">Mark as Recommended</div>'
+        +'<div style="font-size:11px;color:#64748b">Highlights with a Recommended badge in the employee library</div>'
+      +'</div>'
+      +'<label class="toggle" onclick="event.stopPropagation()">'
+        +'<input type="checkbox"'+(newPath.rec?' checked':'')+' onchange="newPath.rec=this.checked;drawCreatePath()">'
+        +'<span class="toggle-track"></span>'
+      +'</label>'
+    +'</div>';
+}
+
+function drawLPStep2() {
+  const allC = LP_CONTENT[lpContentTab];
+  const f = lpContentFilter.toLowerCase();
+  const filtered = f ? allC.filter(i=>i.title.toLowerCase().includes(f)) : allC;
+  const tabs = ['courses','micro','nanos'];
+  const labels = {courses:'Courses', micro:'Micro Trainings', nanos:'Nanos'};
+  let html = '<div style="display:flex;gap:4px;margin-bottom:12px;background:#f1f5f9;border-radius:8px;padding:3px">';
+  tabs.forEach(t => {
+    const active = lpContentTab===t;
+    html += '<div onclick="lpContentTab=\''+t+'\';lpContentFilter=\'\';drawCreatePath()" style="flex:1;text-align:center;padding:5px 6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;'+(active?'background:#fff;color:#308c83;box-shadow:0 1px 3px rgba(0,0,0,0.1)':'color:#64748b')+'">'
+      +labels[t]+'</div>';
+  });
+  html += '</div>';
+  html += '<div class="search-box" style="margin-bottom:10px"><span class="material-icons-outlined">search</span>'
+    +'<input class="inp-sm" id="lp-content-search" placeholder="Search content…" value="'+escAttr(lpContentFilter)+'" oninput="lpContentFilter=this.value;drawLPContentList()"></div>';
+  html += '<div id="lp-avail-list" style="max-height:200px;overflow-y:auto;border:1px solid #e8ecf0;border-radius:8px;margin-bottom:14px">';
+  if (filtered.length===0) {
+    html += '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">No content matches your search</div>';
+  } else {
+    filtered.forEach(item => {
+      const added = newPath.content.some(c=>c.id===item.id);
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #f0f4f8;'+(added?'background:#f0fdf4':'background:#fff')+'">'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:13px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(item.title)+'</div>'
+          +'<div style="font-size:11px;color:#94a3b8;margin-top:2px">'+durStr(item.dur)+' &nbsp;'+lpTypeChip(item.type)+'</div>'
+        +'</div>'
+        +(added
+          ? '<button onclick="lpRemoveContent(\''+item.id+'\')" style="font-size:11px;font-weight:600;color:#ef4444;background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:3px 9px;cursor:pointer;flex-shrink:0">Remove</button>'
+          : '<button onclick="lpAddContent(\''+item.id+'\')" style="font-size:11px;font-weight:600;color:#308c83;background:#f0fdf9;border:1px solid #a7f3d0;border-radius:5px;padding:3px 9px;cursor:pointer;flex-shrink:0">+ Add</button>');
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+  html += '<div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Path Contents <span style="color:#308c83">('+newPath.content.length+' item'+(newPath.content.length!==1?'s':'')+')</span></div>';
+  if (newPath.content.length===0) {
+    html += '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:8px">'
+      +'<span class="material-icons-outlined" style="font-size:28px;display:block;margin-bottom:6px;color:#cbd5e1">playlist_add</span>'
+      +'Add content above to build your path</div>';
+  } else {
+    html += '<div style="border:1px solid #e8ecf0;border-radius:8px;overflow:hidden">';
+    newPath.content.forEach((item, idx) => {
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;'+(idx<newPath.content.length-1?'border-bottom:1px solid #f0f4f8':'')+';background:#fff">'
+        +'<span class="material-icons-outlined" style="font-size:14px;color:#94a3b8">drag_indicator</span>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:12px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(item.title)+'</div>'
+          +'<div style="font-size:11px;color:#94a3b8">'+durStr(item.dur)+'</div>'
+        +'</div>'
+        +lpTypeChip(item.type)
+        +'<button onclick="lpRemoveContent(\''+item.id+'\')" style="background:none;border:none;cursor:pointer;padding:2px;color:#94a3b8;display:flex">'
+          +'<span class="material-icons-outlined" style="font-size:15px">close</span></button>'
+        +'</div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+function drawLPStep3() {
+  const badges = ['🏅','🏆','🎖️','⭐','🛡️','🎓','🔐','🚀'];
+  let html = '<div class="fg"><div class="lbl">Completion Awards</div></div>';
+
+  // Badge
+  html += '<div style="border:1px solid #e8ecf0;border-radius:8px;margin-bottom:10px;overflow:hidden">';
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc">';
+  html += '<div style="font-size:22px">🏅</div>';
+  html += '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1e293b">Badge</div><div style="font-size:11px;color:#64748b">Digital badge employees can display &amp; share</div></div>';
+  html += '<label class="toggle"><input type="checkbox" id="lp-badge"'+(newPath.badge?' checked':'')+' onchange="newPath.badge=this.checked;drawCreatePath()"><span class="toggle-track"></span></label>';
+  html += '</div>';
+  if (newPath.badge) {
+    html += '<div style="padding:12px 14px;border-top:1px solid #f0f4f8">';
+    html += '<div class="fg"><div class="lbl">Badge Name</div><input class="inp" placeholder="e.g., Security Champion" value="'+escAttr(newPath.badgeName)+'" oninput="newPath.badgeName=this.value" style="font-size:13px"></div>';
+    html += '<div class="lbl">Icon</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">';
+    badges.forEach(b => {
+      html += '<div onclick="newPath.badgeIcon=\''+b+'\';drawCreatePath()" style="width:34px;height:34px;border-radius:6px;border:2px solid '+(newPath.badgeIcon===b?'#308c83':'#e2e8f0')+';display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;background:'+(newPath.badgeIcon===b?'#f0fdf9':'#fff')+'">'+b+'</div>';
+    });
+    html += '</div></div>';
+  }
+  html += '</div>';
+
+  // Certificate
+  html += '<div style="border:1px solid #e8ecf0;border-radius:8px;margin-bottom:10px;overflow:hidden">';
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc">';
+  html += '<div style="font-size:22px">📜</div>';
+  html += '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1e293b">Certificate</div><div style="font-size:11px;color:#64748b">Printable completion certificate</div></div>';
+  html += '<label class="toggle"><input type="checkbox" id="lp-cert"'+(newPath.cert?' checked':'')+' onchange="newPath.cert=this.checked"><span class="toggle-track"></span></label>';
+  html += '</div></div>';
+
+  // Points
+  html += '<div style="border:1px solid #e8ecf0;border-radius:8px;margin-bottom:20px;overflow:hidden">';
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc">';
+  html += '<div style="font-size:22px">⭐</div>';
+  html += '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1e293b">Points</div><div style="font-size:11px;color:#64748b">Contributes to leaderboard score</div></div>';
+  html += '<label class="toggle"><input type="checkbox" id="lp-points"'+(newPath.points?' checked':'')+' onchange="newPath.points=this.checked;drawCreatePath()"><span class="toggle-track"></span></label>';
+  html += '</div>';
+  if (newPath.points) {
+    html += '<div style="padding:12px 14px;border-top:1px solid #f0f4f8;display:flex;align-items:center;gap:10px">';
+    html += '<div class="lbl" style="margin:0;white-space:nowrap">Points on completion</div>';
+    html += '<input type="number" class="inp" value="'+newPath.pointsVal+'" min="10" max="1000" step="10" oninput="newPath.pointsVal=+this.value" style="max-width:100px;font-size:13px">';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Summary
+  const totalDur = newPath.content.reduce((s,c)=>s+c.dur,0);
+  html += '<div style="background:#f8fafc;border:1px solid #e8ecf0;border-radius:8px;padding:14px">';
+  html += '<div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Summary</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  [
+    ['Path Name', newPath.name||'—'],
+    ['Status',    newPath.status],
+    ['Content',   newPath.content.length+' item'+(newPath.content.length!==1?'s':'')],
+    ['Est. Time', totalDur ? durStr(totalDur) : '—'],
+  ].forEach(([k,v])=>{
+    html += '<div><div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase">'+k+'</div>'
+      +'<div style="font-size:13px;font-weight:600;color:#1e293b;margin-top:2px">'+escHtml(v)+'</div></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function lpAddContent(id) {
+  const all = [...LP_CONTENT.courses,...LP_CONTENT.micro,...LP_CONTENT.nanos];
+  const item = all.find(i=>i.id===id);
+  if (item && !newPath.content.some(c=>c.id===id)) newPath.content.push(item);
+  drawCreatePath();
+}
+function lpRemoveContent(id) {
+  newPath.content = newPath.content.filter(c=>c.id!==id);
+  drawCreatePath();
+}
+function drawLPContentList() {
+  // partial re-render of just the available list for search
+  drawCreatePath();
+}
+function lpNext() {
+  if (lpStep===1 && !newPath.name.trim()) { showToast('Please enter a path name','#ef4444','warning'); return; }
+  if (lpStep < 3) { lpStep++; drawCreatePath(); }
+}
+function lpBack() { if (lpStep > 1) { lpStep--; drawCreatePath(); } }
+function lpCreate() {
+  if (!newPath.name.trim()) { showToast('Please enter a path name','#ef4444','warning'); return; }
+  showToast('Learning path "'+newPath.name+'" created!','#082f49','check_circle');
+  closePanel();
+  // In a real implementation this would POST to the server and refresh the table
+}
+
+// ═══ HELPERS ════════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function showToast(msg, bg, icon) {
+  const t = document.getElementById('toast');
+  document.getElementById('t-msg').textContent = msg;
+  document.getElementById('t-icon').textContent = icon||'check_circle';
+  t.style.background = bg||'#082f49';
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+init();
+</script>
+</body>
+</html>

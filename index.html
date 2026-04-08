@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BSN Prototype Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: #082f49;
+      height: 58px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: #308c83; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: white; flex-shrink: 0;
+    }
+    .logo-text {
+      color: white; font-weight: 700; font-size: 16px; letter-spacing: 0.5px;
+    }
+    .nav-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+      font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #082f49 0%, #0d3d5c 40%, #308c83 100%);
+      padding: 56px 32px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='20' fill='none' stroke='white' stroke-width='.4' opacity='.06'/%3E%3C/svg%3E") repeat;
+    }
+    .hero-label {
+      display: inline-block;
+      background: rgba(48,140,131,0.25);
+      color: #2dd4bf;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 20px;
+      margin-bottom: 16px; position: relative;
+    }
+    .hero h1 {
+      color: white;
+      font-size: 32px; font-weight: 800;
+      line-height: 1.2; margin-bottom: 12px;
+      position: relative;
+    }
+    .hero p {
+      color: rgba(255,255,255,0.65);
+      font-size: 14px; line-height: 1.7;
+      max-width: 500px; margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── Grid ── */
+    .grid-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+      width: 100%;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      color: #94a3b8; text-transform: uppercase;
+      letter-spacing: 0.8px; margin-bottom: 16px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .proto-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .proto-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(8,47,73,0.12);
+      border-color: #308c83;
+    }
+    .card-thumb {
+      height: 120px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-body-inner {
+      padding: 16px 18px 20px;
+    }
+    .card-title {
+      font-size: 15px; font-weight: 700;
+      color: #0f172a; margin-bottom: 5px;
+    }
+    .card-desc {
+      font-size: 12.5px; color: #64748b;
+      line-height: 1.6; margin-bottom: 12px;
+    }
+    .card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .card-tag {
+      font-size: 10.5px; font-weight: 600;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .card-arrow {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f4f6f9;
+      display: flex; align-items: center; justify-content: center;
+      color: #308c83; font-size: 12px;
+      transition: all 0.2s;
+    }
+    .proto-card:hover .card-arrow {
+      background: #308c83; color: white;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: auto;
+      padding: 20px 32px;
+      text-align: center;
+      font-size: 11.5px;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+  <span class="logo-text">BREACH SECURE NOW</span>
+  <span class="nav-badge">Prototype Suite</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Internal Preview</div>
+  <h1>Employee Dashboard Prototypes</h1>
+  <p>Interactive prototypes for the BSN platform redesign. Open any prototype below to explore the experience.</p>
+</div>
+
+<div class="grid-section">
+
+  <div class="section-label">Employee Views</div>
+  <div class="card-grid">
+
+    <a class="proto-card" href="prototype.html">
+      <div class="card-thumb" style="background: linear-gradient(135deg,#082f49,#308c83);">
+        <i class="fas fa-house" style="color:rgba(255,255,255,0.9);"></i>
+      </div>
+      <div class="card-body-inner">
+        <div class="card-title">Employee Dashboard</div>
+        <div class="card-desc">Main home dashboard with training assignments, learning progress, cybersecurity score, and AI adoption widgets.</div>
+        <div class="card-footer">
+          <span class="card-tag" style="background:#d1fae5;color:#065f46;">Training + Cyber</span>
+          <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </a>
+
+    <a class="proto-card" href="training-hub.html">
+      <div class="card-thumb" style="background: linear-gradient(135deg,#0f172a,#1e3a5f);">
+        <i class="fas fa-graduation-cap" style="color:rgba(255,255,255,0.9);"></i>
+      </div>
+      <div class="card-body-inner">
+        <div class="card-title">Training Hub</div>
+        <div class="card-desc">Full course library with hero carousel, category rows, content filters, and lazy-loading course grid.</div>
+        <div class="card-footer">
+          <span class="card-tag" style="background:#dbeafe;color:#1e40af;">Library</span>
+          <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </a>
+
+    <a class="proto-card" href="training-configuration.html">
+      <div class="card-thumb" style="background: linear-gradient(135deg,#1e1b4b,#3730a3);">
+        <i class="fas fa-sliders" style="color:rgba(255,255,255,0.9);"></i>
+      </div>
+      <div class="card-body-inner">
+        <div class="card-title">Training Configuration</div>
+        <div class="card-desc">Settings and configuration view for managing training programs, assignments, and schedules.</div>
+        <div class="card-footer">
+          <span class="card-tag" style="background:#ede9fe;color:#4c1d95;">Config</span>
+          <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="section-label">Admin Views</div>
+  <div class="card-grid">
+
+    <a class="proto-card" href="manager-dashboard.html">
+      <div class="card-thumb" style="background: linear-gradient(135deg,#1c1917,#44403c);">
+        <i class="fas fa-users" style="color:rgba(255,255,255,0.9);"></i>
+      </div>
+      <div class="card-body-inner">
+        <div class="card-title">Manager Dashboard</div>
+        <div class="card-desc">Team compliance overview, individual member progress, overdue alerts, and policy acknowledgment tracking.</div>
+        <div class="card-footer">
+          <span class="card-tag" style="background:#fff7ed;color:#9a3412;">Manager</span>
+          <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+</div>
+
+<footer>
+  BSN Product Team · Internal Use Only · Not for Distribution
+</footer>
+
+</body>
+</html>

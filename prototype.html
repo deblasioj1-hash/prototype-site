@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BSN Employee Dashboard — Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bsn-navy: #082f49;
+  --bsn-teal: #308c83;
+  --bsn-teal-light: #3da89e;
+  --bsn-purple: #39426f;
+  --bsn-seafoam: #c1ddd8;
+  --bsn-lightblue: #d1faff;
+  --bsn-lightgrey: #dde1ea;
+  --bsn-text: #4c5454;
+  --bsn-heading: #082f49;
+  --grad-primary: linear-gradient(135deg, #308c83 0%, #082f49 100%);
+  --grad-secondary: linear-gradient(135deg, #c1ddd8 0%, #d1faff 100%);
+  --card-shadow: 0 2px 12px rgba(8, 47, 73, 0.06);
+  --card-shadow-hover: 0 4px 20px rgba(8, 47, 73, 0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #f4f7f9;
+  color: var(--bsn-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ==================== TOP NAV ==================== */
+.top-nav {
+  background: var(--bsn-navy);
+  height: 58px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.top-nav .logo {
+  display: flex; align-items: center; gap: 12px;
+  color: white; font-weight: 700; font-size: 16px; letter-spacing: 0.5px;
+}
+.top-nav .logo .shield {
+  width: 36px; height: 36px;
+  background: var(--bsn-teal); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.top-nav .nav-right { display: flex; align-items: center; gap: 12px; }
+.top-nav .switch-view {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.75); font-family: inherit;
+  font-size: 12px; font-weight: 600; padding: 6px 14px;
+  border-radius: 8px; cursor: pointer; transition: var(--transition);
+}
+.top-nav .switch-view:hover { background: rgba(255,255,255,0.14); color: white; }
+.dm-toggle {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px; padding: 5px 10px; cursor: default;
+}
+.dm-icon { font-size: 12px; color: rgba(255,255,255,0.55); }
+.dm-track {
+  width: 28px; height: 14px; background: rgba(255,255,255,0.2);
+  border-radius: 7px; position: relative;
+}
+.dm-thumb {
+  width: 10px; height: 10px; background: white; border-radius: 50%;
+  position: absolute; top: 2px; left: 2px;
+}
+.top-nav .notif-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(255,255,255,0.75); position: relative;
+  font-size: 16px;
+}
+.top-nav .notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--error-red); border: 1.5px solid var(--bsn-navy);
+}
+.top-nav .avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--bsn-teal);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+
+/* ==================== LEFT SIDEBAR ==================== */
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - 58px);
+}
+.sidebar {
+  width: 200px;
+  background: #0a1e2e;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+  gap: 4px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 58px;
+  height: calc(100vh - 58px);
+}
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 12px 12px 8px;
+}
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+.sidebar-item i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+.sidebar-item .sidebar-label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+}
+.sidebar-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.8);
+}
+.sidebar-item.active {
+  background: rgba(48,140,131,0.15);
+  color: white;
+}
+.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: var(--bsn-teal);
+  border-radius: 0 2px 2px 0;
+}
+.sidebar-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 8px 0;
+}
+
+/* ==================== MAIN LAYOUT ==================== */
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+.dashboard-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 32px 60px;
+}
+
+/* ==================== PERSONALIZATION WIDGET ==================== */
+.personalization-widget {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: 24px;
+  transition: var(--transition);
+}
+.personalization-widget:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+.pw-gradient-bar {
+  height: 5px;
+  background: var(--grad-primary);
+}
+.pw-content {
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.pw-left {
+  flex: 1;
+}
+.pw-greeting {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--bsn-heading);
+  margin-bottom: 6px;
+}
+.pw-greeting span {
+  color: var(--bsn-teal);
+}
+.pw-message {
+  font-size: 15px;
+  color: var(--bsn-text);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.pw-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bsn-teal);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.pw-cta:hover {
+  background: var(--bsn-teal-light);
+  transform: translateY(-1px);
+}
+.pw-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Notification bell */
+.notification-bell {
+  position: relative;
+  background: #f0f4f8;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 20px;
+  color: var(--bsn-navy);
+}
+.notification-bell:hover { background: #e2e8f0; }
+.notif-badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background: #e74c3c;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* ==================== NOTIFICATION SHELF ==================== */
+.shelf-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8,47,73,0.25);
+  z-index: 500;
+}
+.shelf-overlay.open { display: block; }
+.shelf {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 24px rgba(8,47,73,0.12);
+  z-index: 600;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+.shelf.open { right: 0; }
+.shelf-header {
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid #f0f4f8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.shelf-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--bsn-heading);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.shelf-header h2 i { color: var(--bsn-teal); }
+.shelf-header .shelf-count {
+  background: #e74c3c;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 12px;
+}
+.shelf-header .shelf-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.shelf-header .mark-read {
+  font-size: 12px;
+  color: var(--bsn-teal);
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+.shelf-header .mark-read:hover { text-decoration: underline; }
+.shelf-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px;
+  line-height: 1;
+}
+.shelf-close:hover { color: var(--bsn-heading); }
+.shelf-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.shelf-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 3px solid transparent;
+}
+.shelf-item:hover {
+  background: #f8fafb;
+}
+.shelf-item.unread {
+  background: #f8fbff;
+  border-left-color: var(--bsn-teal);
+}
+.shelf-item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.shelf-item-icon.assignment { background: #e8f5e9; color: #2e7d32; }
+.shelf-item-icon.achievement { background: #fff3e0; color: #ef6c00; }
+.shelf-item-icon.admin { background: #e3f2fd; color: #1565c0; }
+.shelf-item-content { flex: 1; min-width: 0; }
+.shelf-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bsn-heading);
+  margin-bottom: 3px;
+}
+.shelf-item-desc {
+  font-size: 13px;
+  color: var(--bsn-text);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.shelf-item-time {
+  font-size: 11px;
+  color: #b0bec5;
+  font-weight: 500;
+}
+.shelf-item-action {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 5px 14px;
+  background: var(--bsn-teal);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.shelf-item-action:hover { background: var(--bsn-teal-light); }
+.shelf-divider {
+  padding: 12px 24px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* (notification flyout removed — replaced by inline feed) */
+
+/* ==================== WIDGET GRID ==================== */
+.widget-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* ==================== CARD BASE ==================== */
+.widget-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  opacity: 1;
+  transform: translateY(0);
+}
+.widget-card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+.widget-card.hidden {
+  display: none;
+}
+.widget-card .card-header {
+  padding: 20px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.widget-card .card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bsn-heading);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.widget-card .card-title .widget-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.widget-card .card-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.widget-card .card-badge.warning { background: #fff3e0; color: #ef6c00; }
+.widget-card .card-badge.info { background: #e3f2fd; color: #1565c0; }
+.widget-card .card-badge.purple { background: #ede7f6; color: #5e35b1; }
+.widget-card .card-body { padding: 16px 24px 24px; }
+
+/* ==================== ASSIGNMENT LIST ==================== */
+.assignment-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f4f6f8;
+  gap: 14px;
+}
+.assignment-item:last-child { border-bottom: none; }
+.required-assignments-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 14px 0 8px;
+}
+.overdue-tag {
+  display: inline-block;
+  background: #fce4ec;
+  color: #c62828;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.due-soon-tag {
+  display: inline-block;
+  background: #fff3e0;
+  color: #e65100;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.assignment-info { flex: 1; }
+.assignment-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bsn-heading);
+  margin-bottom: 4px;
+}
+.assignment-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.assignment-meta .required-tag {
+  background: var(--bsn-teal);
+  color: white;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.meta-sep { color: #cbd5e1; }
+.meta-path {
+  color: var(--bsn-teal);
+  font-weight: 500;
+  cursor: pointer;
+}
+.meta-path:hover { text-decoration: underline; }
+.meta-path i { font-size: 10px; margin-right: 2px; }
+.view-all-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: none;
+  border-top: 1px solid #f0f4f8;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bsn-teal);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.view-all-btn:hover {
+  background: #f8fafb;
+}
+.view-all-btn i {
+  font-size: 11px;
+  transition: transform 0.3s ease;
+}
+.assignment-progress {
+  width: 90px;
+  text-align: right;
+}
+.progress-bar-bg {
+  height: 6px;
+  background: #f0f4f8;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.progress-bar-fill.teal { background: var(--bsn-teal); }
+.progress-bar-fill.orange { background: #ef6c00; }
+.progress-bar-fill.red { background: #c62828; }
+.progress-bar-fill.green { background: #2e7d32; }
+.progress-pct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bsn-text);
+}
+.assignment-action {
+  padding: 6px 14px;
+  background: var(--bsn-teal);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.assignment-action:hover { background: var(--bsn-teal-light); }
+.assignment-action.secondary {
+  background: transparent;
+  color: var(--bsn-teal);
+  border: 1.5px solid var(--bsn-teal);
+}
+
+/* Assignment summary stats */
+.assign-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid #f0f4f8;
+  margin-bottom: 4px;
+}
+.assign-stat {
+  flex: 1;
+  text-align: center;
+}
+.assign-stat-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--bsn-navy);
+  line-height: 1.1;
+}
+.assign-stat-num.attention { color: #c62828; }
+.assign-stat-num.warning { color: #ef6c00; }
+.assign-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 3px;
+}
+.assign-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: #eef2f6;
+}
+
+/* ==================== TRAINING STATISTICS ==================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.stat-card {
+  background: var(--grad-secondary);
+  border-radius: var(--radius-sm);
+  padding: 18px 16px;
+  text-align: center;
+}
+.stat-card .stat-num {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--bsn-navy);
+  line-height: 1.1;
+}
+.stat-card .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bsn-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 6px;
+}
+.stat-card .stat-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+.stat-insight {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: #f8fafb;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--bsn-teal);
+  font-size: 13px;
+  color: var(--bsn-text);
+}
+.stat-insight i { color: var(--bsn-teal); margin-right: 6px; }
+
+/* ==================== MY LEARNING ==================== */
+.achievement-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.achievement-card {
+  flex: 1;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.achievement-card:hover { transform: translateY(-2px); }
+.achievement-card.certs { background: #e8f5e9; }
+.achievement-card.badges { background: #fff3e0; }
+.achievement-card.points { background: #e3f2fd; }
+.achievement-card .ach-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+.achievement-card .ach-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bsn-heading);
+}
+.achievement-card .ach-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bsn-text);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.leaderboard-preview {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: #f8fafb;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.leaderboard-preview .lb-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.leaderboard-preview .lb-rank {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--bsn-teal);
+}
+.leaderboard-preview .lb-text {
+  font-size: 13px;
+  color: var(--bsn-text);
+}
+.leaderboard-preview .lb-text strong { color: var(--bsn-heading); }
+.leaderboard-preview a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bsn-teal);
+  text-decoration: none;
+}
+.leaderboard-preview a:hover { text-decoration: underline; }
+
+/* ==================== LEARNING PATHS ==================== */
+.path-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #f4f6f8;
+}
+.path-item:last-child { border-bottom: none; }
+.path-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.path-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bsn-heading);
+}
+.path-pct {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bsn-teal);
+}
+.path-progress-bg {
+  height: 8px;
+  background: #f0f4f8;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.path-progress-fill {
+  height: 100%;
+  background: var(--grad-primary);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.path-next {
+  font-size: 12px;
+  color: #94a3b8;
+}
+.path-next strong {
+  color: var(--bsn-teal);
+  cursor: pointer;
+}
+
+/* ==================== ESS WIDGET ==================== */
+.ess-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 16px;
+  align-items: center;
+}
+.ess-score-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+.ess-score-ring svg { transform: rotate(-90deg); }
+.ess-score-ring .score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.ess-score-ring .score-num {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--bsn-navy);
+  line-height: 1;
+}
+.ess-score-ring .score-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+.ess-breakdown { flex: 1; }
+.ess-factor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ess-factor-name {
+  font-size: 12px;
+  color: var(--bsn-text);
+  width: 90px;
+}
+.ess-factor-bar {
+  flex: 1;
+  height: 6px;
+  background: #f0f4f8;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ess-factor-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.ess-factor-fill.high { background: #2e7d32; }
+.ess-factor-fill.medium { background: #ef6c00; }
+.ess-factor-fill.low { background: #c62828; }
+.ess-factor-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bsn-text);
+  width: 35px;
+  text-align: right;
+}
+.ess-trend {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #e8f5e9;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: #2e7d32;
+  font-weight: 600;
+}
+.ess-trend i { margin-right: 6px; }
+
+/* ESS sub-grid (2-column: Phishing/DarkWeb left, Leaderboard/Training right) */
+.ess-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #f0f4f8;
+}
+.ess-subsection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px 11px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+.ess-stat-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0 11px 14px;
+  border-bottom: 1px solid #f0f4f8;
+  border-left: 1px solid #f0f4f8;
+}
+.ess-sub-icon, .ess-stat-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.ess-sub-info, .ess-stat-info { flex: 1; min-width: 0; }
+.ess-sub-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bsn-heading);
+}
+.ess-sub-detail {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.ess-stat-label {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.ess-stat-value {
+  font-size: 15px;
+  font-weight: 800;
+  margin-top: 1px;
+}
+
+/* ==================== PHISHING WIDGET ==================== */
+.phishing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.phishing-stat {
+  text-align: center;
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  background: #f8fafb;
+}
+.phishing-stat .ph-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bsn-heading);
+}
+.phishing-stat .ph-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.phishing-status-bar {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: #e8f5e9;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+/* ==================== DARK WEB WIDGET ==================== */
+.dw-status {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #e8f5e9;
+  border-radius: var(--radius-sm);
+}
+.dw-icon {
+  width: 48px;
+  height: 48px;
+  background: #c8e6c9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #2e7d32;
+}
+.dw-info .dw-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+.dw-info .dw-sub {
+  font-size: 12px;
+  color: #66bb6a;
+  margin-top: 2px;
+}
+.dw-details {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--bsn-text);
+  line-height: 1.7;
+}
+
+/* ==================== POLICIES WIDGET ==================== */
+.policy-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f4f6f8;
+  gap: 12px;
+}
+.policy-item:last-child { border-bottom: none; }
+.policy-status-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+.policy-status-icon.done { background: #e8f5e9; color: #2e7d32; }
+.policy-status-icon.pending { background: #fff3e0; color: #ef6c00; }
+.policy-info { flex: 1; }
+.policy-name { font-size: 13px; font-weight: 600; color: var(--bsn-heading); }
+.policy-date { font-size: 11px; color: #94a3b8; }
+
+/* ==================== RISK ASSESSMENT WIDGET ==================== */
+.risk-summary {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.risk-card {
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.risk-card.completed { background: #e8f5e9; }
+.risk-card.pending { background: #fff3e0; }
+.risk-card .risk-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--bsn-heading);
+}
+.risk-card .risk-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.risk-card.completed .risk-label { color: #2e7d32; }
+.risk-card.pending .risk-label { color: #ef6c00; }
+
+/* ==================== DEV TOOL ==================== */
+.dev-tool {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bsn-navy);
+  color: white;
+  z-index: 1000;
+  transition: var(--transition);
+}
+.dev-tool-toggle {
+  position: absolute;
+  top: -36px;
+  right: 20px;
+  background: var(--bsn-navy);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px 8px 0 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dev-tool-panel {
+  padding: 20px 32px;
+  display: none;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.dev-tool-panel.open { display: block; }
+.dev-tool h3 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--bsn-teal);
+  margin-bottom: 14px;
+}
+.dev-sections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.dev-section h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+.state-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition);
+}
+.state-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+.state-btn.active {
+  background: var(--bsn-teal);
+  color: white;
+  border-color: var(--bsn-teal);
+}
+.widget-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+.widget-toggle input[type="checkbox"] { accent-color: var(--bsn-teal); }
+.widget-toggle label { cursor: pointer; }
+.tier-label {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.tier-label.training { background: rgba(46,125,50,0.2); color: #66bb6a; }
+.tier-label.cyber { background: rgba(156,39,176,0.2); color: #ce93d8; }
+
+/* ==================== DRAWER ==================== */
+.drawer-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8,47,73,0.3);
+  z-index: 500;
+}
+.drawer-overlay.open { display: block; }
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 420px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 20px rgba(8,47,73,0.1);
+  z-index: 600;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+.drawer.open { right: 0; }
+.drawer-header {
+  padding: 24px;
+  border-bottom: 1px solid #f0f4f8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.drawer-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--bsn-heading);
+}
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px;
+}
+.drawer-body { padding: 24px; }
+
+/* ==================== EMPTY / NEW USER STATES ==================== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+.empty-state .empty-icon {
+  font-size: 48px;
+  color: var(--bsn-seafoam);
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bsn-heading);
+  margin-bottom: 8px;
+}
+.empty-state p {
+  font-size: 13px;
+  color: #94a3b8;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.widget-card { animation: fadeInUp 0.4s ease both; }
+.widget-card:nth-child(1) { animation-delay: 0.05s; }
+.widget-card:nth-child(2) { animation-delay: 0.1s; }
+.widget-card:nth-child(3) { animation-delay: 0.15s; }
+.widget-card:nth-child(4) { animation-delay: 0.2s; }
+.widget-card:nth-child(5) { animation-delay: 0.25s; }
+.widget-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* Full-width widget span */
+.widget-card.full-width {
+  grid-column: 1 / -1;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== TOP NAV ==================== -->
+<nav class="top-nav">
+  <div class="logo">
+    <div class="shield"><i class="fas fa-shield-halved"></i></div>
+    <span>BREACH SECURE NOW</span>
+  </div>
+  <div class="nav-right">
+    <div class="dm-toggle">
+      <i class="fa-regular fa-sun dm-icon"></i>
+      <div class="dm-track"><div class="dm-thumb"></div></div>
+      <i class="fa-regular fa-moon dm-icon"></i>
+    </div>
+    <div class="notif-btn">
+      <i class="fa-regular fa-bell"></i>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="avatar">JD</div>
+  </div>
+</nav>
+
+<!-- ==================== APP LAYOUT ==================== -->
+<div class="app-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <a class="sidebar-item active" href="#">
+      <i class="fas fa-house"></i>
+      <span class="sidebar-label">Home</span>
+    </a>
+    <a class="sidebar-item" href="training-hub.html">
+      <i class="fas fa-graduation-cap"></i>
+      <span class="sidebar-label">Training Hub</span>
+    </a>
+    <a class="sidebar-item" href="manager-dashboard.html">
+      <i class="fas fa-building"></i>
+      <span class="sidebar-label">My Company</span>
+    </a>
+    <a class="sidebar-item" href="#">
+      <i class="fas fa-briefcase"></i>
+      <span class="sidebar-label">Manage Clients</span>
+    </a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="dashboard-container">
+
+  <!-- PERSONALIZATION WIDGET -->
+  <div class="personalization-widget" id="widget-personalization">
+    <div class="pw-gradient-bar"></div>
+    <div class="pw-content">
+      <div class="pw-left">
+        <div class="pw-greeting" id="pw-greeting">Good afternoon, <span>John</span></div>
+        <div class="pw-message" id="pw-message">You're on a <strong>5-day streak</strong> — keep the momentum going! Pick up where you left off below.</div>
+        <button class="pw-cta" id="pw-cta">
+          <i class="fas fa-play-circle"></i>
+          <span id="pw-cta-text">Continue: Phishing Awareness 101</span>
+        </button>
+      </div>
+      <div class="pw-right">
+        <button class="notification-bell" id="notif-bell" onclick="toggleShelf()">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="notif-count">3</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIDGET GRID -->
+  <div class="widget-grid" id="widget-grid">
+
+    <!-- TRAINING ASSIGNMENTS -->
+    <div class="widget-card" id="widget-assignments">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fas fa-list-check"></i></div> Training Assignments</div>
+      </div>
+      <div class="card-body">
+        <!-- Summary stats row: % Complete, Overdue, Due Soon -->
+        <div class="assign-stats-row">
+          <div class="assign-stat">
+            <div class="assign-stat-num">25%</div>
+            <div class="assign-stat-label">Complete</div>
+          </div>
+          <div class="assign-stat-divider"></div>
+          <div class="assign-stat">
+            <div class="assign-stat-num attention">1</div>
+            <div class="assign-stat-label">Overdue</div>
+          </div>
+          <div class="assign-stat-divider"></div>
+          <div class="assign-stat">
+            <div class="assign-stat-num warning">2</div>
+            <div class="assign-stat-label">Due Soon</div>
+          </div>
+        </div>
+        <!-- Required Assignments list -->
+        <div class="required-assignments-label">Required Assignments</div>
+        <div class="assignment-item">
+          <div class="assignment-info">
+            <div class="assignment-name">Phishing Awareness 101</div>
+            <div class="assignment-meta"><span class="overdue-tag">Overdue</span></div>
+          </div>
+          <button class="assignment-action">Continue</button>
+        </div>
+        <div class="assignment-item">
+          <div class="assignment-info">
+            <div class="assignment-name">Data Privacy Fundamentals</div>
+            <div class="assignment-meta"><span class="due-soon-tag">Due Soon</span></div>
+          </div>
+          <button class="assignment-action">Start</button>
+        </div>
+        <div class="assignment-item" style="border-bottom:none;">
+          <div class="assignment-info">
+            <div class="assignment-name">Intro to AI Security</div>
+            <div class="assignment-meta"><span class="due-soon-tag">Due Soon</span></div>
+          </div>
+          <button class="assignment-action">Start</button>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('Training Assignments', assignmentDrawerContent)">
+          View all required assignments (6) <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- TRAINING STATISTICS -->
+    <!-- MY LEARNING -->
+    <div class="widget-card" id="widget-learning">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-medal"></i></div> My Learning</div>
+        <div class="card-badge purple">Level 3</div>
+      </div>
+      <div class="card-body">
+        <div class="achievement-row">
+          <div class="achievement-card certs">
+            <div class="ach-icon">📜</div>
+            <div class="ach-num">2</div>
+            <div class="ach-label">Certificates</div>
+          </div>
+          <div class="achievement-card badges">
+            <div class="ach-icon">🏆</div>
+            <div class="ach-num">5</div>
+            <div class="ach-label">Badges</div>
+          </div>
+          <div class="achievement-card points">
+            <div class="ach-icon">✅</div>
+            <div class="ach-num">2</div>
+            <div class="ach-label">Completed</div>
+          </div>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('My Learning', learningDrawerContent)">
+          View learning profile <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- LEARNING PATHS -->
+    <div class="widget-card" id="widget-paths">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-route"></i></div> Learning Paths</div>
+        <div class="card-badge">3 Paths</div>
+      </div>
+      <div class="card-body">
+        <div class="path-item">
+          <div class="path-top">
+            <div class="path-name">Cybersecurity Essentials</div>
+            <div class="path-pct">40%</div>
+          </div>
+          <div class="path-progress-bg"><div class="path-progress-fill" style="width:40%"></div></div>
+        </div>
+        <div class="path-item">
+          <div class="path-top">
+            <div class="path-name">Compliance Foundations</div>
+            <div class="path-pct">75%</div>
+          </div>
+          <div class="path-progress-bg"><div class="path-progress-fill" style="width:75%"></div></div>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('Learning Paths', pathsDrawerContent)">
+          View all paths <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- CYBERSECURITY WIDGET (ESS + Phishing + Dark Web) -->
+    <div class="widget-card" id="widget-ess">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#d1fae5;color:#308c83;"><i class="fas fa-shield-halved"></i></div> Cybersecurity</div>
+        <div class="card-badge">Good</div>
+      </div>
+      <div class="card-body">
+        <!-- Score ring + trend pill -->
+        <div style="display:flex;align-items:center;gap:20px;padding:8px 0 16px;">
+          <div class="ess-score-ring">
+            <svg width="110" height="110" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#f0f4f8" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#308c83" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="314" stroke-dashoffset="88"/>
+            </svg>
+            <div class="score-text">
+              <div class="score-num">720</div>
+              <div class="score-label">ESS</div>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div class="ess-trend" style="margin-top:0;"><i class="fas fa-arrow-up"></i> +3 from last month</div>
+          </div>
+        </div>
+        <!-- 2-column sub-grid -->
+        <div class="ess-subgrid">
+          <!-- Row 1 left: Phishing -->
+          <div class="ess-subsection">
+            <div class="ess-sub-icon" style="background:#fff3e0;color:#ef6c00;"><i class="fas fa-fish"></i></div>
+            <div class="ess-sub-info">
+              <div class="ess-sub-title">Phishing</div>
+              <div class="ess-sub-detail" style="color:#ef6c00;">1 recent fail</div>
+            </div>
+          </div>
+          <!-- Row 1 right: Leaderboard Rank -->
+          <div class="ess-stat-cell">
+            <div class="ess-stat-icon" style="background:#fff8e1;color:#f59e0b;"><i class="fas fa-trophy"></i></div>
+            <div class="ess-stat-info">
+              <div class="ess-stat-label">Leaderboard Rank</div>
+              <div class="ess-stat-value" style="color:#f59e0b;">5th</div>
+            </div>
+          </div>
+          <!-- Row 2 left: Dark Web -->
+          <div class="ess-subsection" style="border-bottom:none;">
+            <div class="ess-sub-icon" style="background:#e8f5e9;color:#2e7d32;"><i class="fas fa-user-secret"></i></div>
+            <div class="ess-sub-info">
+              <div class="ess-sub-title">Dark Web</div>
+              <div class="ess-sub-detail" style="color:#2e7d32;">0 Breaches</div>
+            </div>
+          </div>
+          <!-- Row 2 right: Required Training % -->
+          <div class="ess-stat-cell" style="border-bottom:none;">
+            <div class="ess-stat-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fas fa-graduation-cap"></i></div>
+            <div class="ess-stat-info">
+              <div class="ess-stat-label">Required Training</div>
+              <div class="ess-stat-value" style="color:#0284c7;">25%</div>
+            </div>
+          </div>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('Cybersecurity Overview', essDrawerContent)">
+          View full breakdown <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- AI ADOPTION WIDGET -->
+    <div class="widget-card" id="widget-ai">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-robot"></i></div> AI Adoption</div>
+        <div class="card-badge" style="background:#ede9fe;color:#7c3aed;">Growing</div>
+      </div>
+      <div class="card-body">
+        <!-- Score ring + trend -->
+        <div style="display:flex;align-items:center;gap:20px;padding:8px 0 16px;">
+          <div class="ess-score-ring">
+            <svg width="110" height="110" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#f0f4f8" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#7c3aed" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="314" stroke-dashoffset="173"/>
+            </svg>
+            <div class="score-text">
+              <div class="score-num" style="color:#7c3aed;">45%</div>
+              <div class="score-label">Adopted</div>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div class="ess-trend" style="margin-top:0;color:#7c3aed;background:#ede9fe;"><i class="fas fa-arrow-up"></i> +12% this month</div>
+          </div>
+        </div>
+        <!-- Sub-grid -->
+        <div class="ess-subgrid">
+          <div class="ess-subsection">
+            <div class="ess-sub-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <div class="ess-sub-info">
+              <div class="ess-sub-title">Tools Used</div>
+              <div class="ess-sub-detail" style="color:#7c3aed;">3 of 7</div>
+            </div>
+          </div>
+          <div class="ess-stat-cell">
+            <div class="ess-stat-icon" style="background:#f3e8ff;color:#9333ea;"><i class="fas fa-graduation-cap"></i></div>
+            <div class="ess-stat-info">
+              <div class="ess-stat-label">AI Training</div>
+              <div class="ess-stat-value" style="color:#9333ea;">60%</div>
+            </div>
+          </div>
+          <div class="ess-subsection" style="border-bottom:none;">
+            <div class="ess-sub-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-file-shield"></i></div>
+            <div class="ess-sub-info">
+              <div class="ess-sub-title">AI Policy</div>
+              <div class="ess-sub-detail" style="color:#db2777;">Pending review</div>
+            </div>
+          </div>
+          <div class="ess-stat-cell" style="border-bottom:none;">
+            <div class="ess-stat-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fas fa-chart-line"></i></div>
+            <div class="ess-stat-info">
+              <div class="ess-stat-label">Usage Trend</div>
+              <div class="ess-stat-value" style="color:#0284c7;">↑ Active</div>
+            </div>
+          </div>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('AI Adoption', aiDrawerContent)">
+          View full breakdown <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- POLICIES WIDGET -->
+    <div class="widget-card" id="widget-policies">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-file-signature"></i></div> Policies</div>
+        <div class="card-badge warning">1 Pending</div>
+      </div>
+      <div class="card-body">
+        <div class="policy-item">
+          <div class="policy-status-icon pending"><i class="fas fa-clock"></i></div>
+          <div class="policy-info">
+            <div class="policy-name">Acceptable Use Policy</div>
+            <div class="policy-date">Requires acknowledgment by Apr 1</div>
+          </div>
+          <button class="assignment-action">Review</button>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;padding:8px 0 4px;"><i class="fas fa-check-circle" style="color:#2e7d32;margin-right:4px;"></i> 2 policies acknowledged</div>
+        <button class="view-all-btn" onclick="openDrawer('Policies', policiesDrawerContent)">
+          View all policies <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MANAGER WIDGET -->
+    <div class="widget-card" id="widget-manager">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#fff7ed;color:#ea580c;"><i class="fas fa-users"></i></div> My Team</div>
+        <div class="card-badge warning">2 Alerts</div>
+      </div>
+      <div class="card-body">
+        <div class="assign-stats-row" style="margin-bottom:16px;">
+          <div class="assign-stat">
+            <div class="assign-stat-num">72%</div>
+            <div class="assign-stat-label">Compliant</div>
+          </div>
+          <div class="assign-stat-divider"></div>
+          <div class="assign-stat">
+            <div class="assign-stat-num attention">3</div>
+            <div class="assign-stat-label">Overdue</div>
+          </div>
+          <div class="assign-stat-divider"></div>
+          <div class="assign-stat">
+            <div class="assign-stat-num">8</div>
+            <div class="assign-stat-label">Members</div>
+          </div>
+        </div>
+        <div class="assignment-item">
+          <div class="assignment-info">
+            <div class="assignment-name">Training compliance</div>
+            <div class="assignment-meta"><span class="overdue-tag">3 overdue</span></div>
+          </div>
+          <button class="assignment-action" onclick="openDrawer('My Team', managerDrawerContent)">Review</button>
+        </div>
+        <div class="assignment-item" style="border-bottom:none;">
+          <div class="assignment-info">
+            <div class="assignment-name">Policy acknowledgments</div>
+            <div class="assignment-meta"><span class="due-soon-tag">2 pending</span></div>
+          </div>
+          <button class="assignment-action" onclick="openDrawer('My Team', managerDrawerContent)">Review</button>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('My Team', managerDrawerContent)">
+          View team dashboard <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- PARTNER ADMIN WIDGET -->
+    <div class="widget-card" id="widget-pa">
+      <div class="card-header">
+        <div class="card-title"><div class="widget-icon" style="background:#e0e7ff;color:#4338ca;"><i class="fas fa-building-user"></i></div> Partner Admin</div>
+        <div class="card-badge" style="background:#fee2e2;color:#dc2626;">Action Needed</div>
+      </div>
+      <div class="card-body">
+        <div class="assign-stats-row" style="margin-bottom:16px;">
+          <div class="assign-stat">
+            <div class="assign-stat-num">12</div>
+            <div class="assign-stat-label">Clients</div>
+          </div>
+          <div class="assign-stat-divider"></div>
+          <div class="assign-stat">
+            <div class="assign-stat-num attention">1</div>
+            <div class="assign-stat-label">Setup Pending</div>
+          </div>
+          <div class="assign-stat-divider"></div>
+          <div class="assign-stat">
+            <div class="assign-stat-num warning">4</div>
+            <div class="assign-stat-label">Tasks</div>
+          </div>
+        </div>
+        <div class="assignment-item">
+          <div class="assignment-info">
+            <div class="assignment-name">Acme Corp onboarding</div>
+            <div class="assignment-meta"><span class="overdue-tag">Setup incomplete</span></div>
+          </div>
+          <button class="assignment-action" onclick="openDrawer('Partner Admin', paDrawerContent)">Open</button>
+        </div>
+        <div class="assignment-item" style="border-bottom:none;">
+          <div class="assignment-info">
+            <div class="assignment-name">Q2 compliance reports</div>
+            <div class="assignment-meta"><span class="due-soon-tag">Due Apr 15</span></div>
+          </div>
+          <button class="assignment-action" onclick="openDrawer('Partner Admin', paDrawerContent)">Open</button>
+        </div>
+        <button class="view-all-btn" onclick="openDrawer('Partner Admin', paDrawerContent)">
+          View admin dashboard <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /widget-grid -->
+    </div><!-- /dashboard-container -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ==================== DRAWER ==================== -->
+<!-- ==================== NOTIFICATION SHELF ==================== -->
+<div class="shelf-overlay" id="shelf-overlay" onclick="closeShelf()"></div>
+<div class="shelf" id="shelf">
+  <div class="shelf-header">
+    <h2><i class="fas fa-bell"></i> Notifications <span class="shelf-count">3</span></h2>
+    <div class="shelf-actions">
+      <button class="mark-read">Mark all read</button>
+      <button class="shelf-close" onclick="closeShelf()">&times;</button>
+    </div>
+  </div>
+  <div class="shelf-body">
+    <div class="shelf-divider">New</div>
+    <div class="shelf-item unread" onclick="closeShelf(); openDrawer('New Course Assigned', notifDrawerContent.assignment)">
+      <div class="shelf-item-icon assignment"><i class="fas fa-book"></i></div>
+      <div class="shelf-item-content">
+        <div class="shelf-item-title">New course assigned</div>
+        <div class="shelf-item-desc">Data Privacy Fundamentals has been added to your Compliance Foundations learning path.</div>
+        <div class="shelf-item-time">2 hours ago</div>
+        <button class="shelf-item-action" onclick="event.stopPropagation();">Start course &rarr;</button>
+      </div>
+    </div>
+    <div class="shelf-divider">Earlier</div>
+    <div class="shelf-item unread" onclick="closeShelf(); openDrawer('Badge Earned!', notifDrawerContent.badge)">
+      <div class="shelf-item-icon achievement"><i class="fas fa-trophy"></i></div>
+      <div class="shelf-item-content">
+        <div class="shelf-item-title">Badge earned: Security Starter</div>
+        <div class="shelf-item-desc">You earned the Security Starter badge for completing your first security course!</div>
+        <div class="shelf-item-time">Yesterday</div>
+      </div>
+    </div>
+    <div class="shelf-item unread" onclick="closeShelf(); openDrawer('Policy Acknowledgment', notifDrawerContent.policy)">
+      <div class="shelf-item-icon admin"><i class="fas fa-file-signature"></i></div>
+      <div class="shelf-item-content">
+        <div class="shelf-item-title">New policy requires acknowledgment</div>
+        <div class="shelf-item-desc">Acceptable Use Policy has been published. Please review and acknowledge by April 1.</div>
+        <div class="shelf-item-time">2 days ago</div>
+        <button class="shelf-item-action" onclick="event.stopPropagation();">Review policy &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DRAWER ==================== -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2 id="drawer-title">Details</h2>
+    <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<!-- ==================== DEV TOOL ==================== -->
+<div class="dev-tool" id="dev-tool">
+  <button class="dev-tool-toggle" onclick="toggleDevTool()">
+    <i class="fas fa-wrench"></i> Prototype Controls
+  </button>
+  <div class="dev-tool-panel" id="dev-panel">
+    <div class="dev-sections">
+      <div class="dev-section">
+        <h4>Lifecycle State</h4>
+        <button class="state-btn active" onclick="setLifecycleState('new')">🆕 New User</button>
+        <button class="state-btn" onclick="setLifecycleState('active')">📋 Active User</button>
+        <button class="state-btn" onclick="setLifecycleState('completed')">✅ Completed User</button>
+        <button class="state-btn" onclick="setLifecycleState('discovery')">🔍 Discovery Mode</button>
+      </div>
+      <div class="dev-section">
+        <h4>Training Widgets</h4>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-personalization" checked onchange="toggleWidget('personalization')">
+          <label for="tog-personalization">Personalization</label>
+          <span class="tier-label training">Training</span>
+        </div>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-assignments" checked onchange="toggleWidget('assignments')">
+          <label for="tog-assignments">Assignment List</label>
+          <span class="tier-label training">Training</span>
+        </div>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-learning" checked onchange="toggleWidget('learning')">
+          <label for="tog-learning">My Learning</label>
+          <span class="tier-label training">Training</span>
+        </div>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-paths" checked onchange="toggleWidget('paths')">
+          <label for="tog-paths">Learning Paths</label>
+          <span class="tier-label training">Training</span>
+        </div>
+      </div>
+      <div class="dev-section">
+        <h4>AI Widgets</h4>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-ai" checked onchange="toggleWidget('ai')">
+          <label for="tog-ai">AI Adoption</label>
+          <span class="tier-label" style="background:#ede9fe;color:#7c3aed;">AI</span>
+        </div>
+      </div>
+      <div class="dev-section">
+        <h4>Cybersecurity Widgets</h4>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-ess" checked onchange="toggleWidget('ess')">
+          <label for="tog-ess">Cybersecurity (ESS + Phishing + Dark Web)</label>
+          <span class="tier-label cyber">Cyber</span>
+        </div>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-policies" checked onchange="toggleWidget('policies')">
+          <label for="tog-policies">Policies</label>
+          <span class="tier-label cyber">Cyber</span>
+        </div>
+      </div>
+      <div class="dev-section">
+        <h4>Role Widgets</h4>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-manager" checked onchange="toggleWidget('manager')">
+          <label for="tog-manager">My Team (Manager)</label>
+          <span class="tier-label" style="background:#fff7ed;color:#ea580c;">Manager</span>
+        </div>
+        <div class="widget-toggle">
+          <input type="checkbox" id="tog-pa" checked onchange="toggleWidget('pa')">
+          <label for="tog-pa">Partner Admin</label>
+          <span class="tier-label" style="background:#e0e7ff;color:#4338ca;">PA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== NOTIFICATION SHELF ====================
+function toggleShelf() {
+  document.getElementById('shelf').classList.toggle('open');
+  document.getElementById('shelf-overlay').classList.toggle('open');
+}
+function closeShelf() {
+  document.getElementById('shelf').classList.remove('open');
+  document.getElementById('shelf-overlay').classList.remove('open');
+}
+
+// ==================== NOTIFICATION DRAWER CONTENT ====================
+const notifDrawerContent = {
+  assignment: `
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="width:40px;height:40px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:16px;"><i class="fas fa-book"></i></div>
+        <div><div style="font-size:11px;color:#94a3b8;font-weight:600;">NEW ASSIGNMENT</div><div style="font-size:11px;color:#94a3b8;">2 hours ago</div></div>
+      </div>
+      <h3 style="font-size:16px;font-weight:700;color:#082f49;margin-bottom:8px;">Data Privacy Fundamentals</h3>
+      <p style="font-size:14px;line-height:1.7;color:#4c5454;margin-bottom:16px;">This course has been assigned to you as part of the <strong>Compliance Foundations</strong> learning path. It covers data handling, GDPR basics, and privacy best practices.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div style="background:#f8fafb;padding:14px;border-radius:10px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#082f49;">30</div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">MINUTES</div>
+        </div>
+        <div style="background:#f8fafb;padding:14px;border-radius:10px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#082f49;">Apr 5</div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">DUE DATE</div>
+        </div>
+      </div>
+      <button style="width:100%;padding:14px;background:#308c83;color:white;border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">Start Course <i class="fas fa-external-link-alt" style="margin-left:6px;"></i></button>
+    </div>`,
+  badge: `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:64px;margin-bottom:16px;">🏆</div>
+      <h3 style="font-size:18px;font-weight:700;color:#082f49;margin-bottom:8px;">Security Starter</h3>
+      <p style="font-size:14px;color:#94a3b8;margin-bottom:20px;">Earned for completing your first security training course.</p>
+      <div style="background:#fff3e0;padding:16px;border-radius:10px;margin-bottom:20px;">
+        <div style="font-size:13px;color:#ef6c00;font-weight:600;">You now have 5 badges total</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:4px;">2 more to reach Level 4</div>
+      </div>
+      <a href="#" style="font-size:14px;font-weight:600;color:#308c83;text-decoration:none;">View all badges &rarr;</a>
+    </div>`,
+  policy: `
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="width:40px;height:40px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;color:#1565c0;font-size:16px;"><i class="fas fa-file-signature"></i></div>
+        <div><div style="font-size:11px;color:#94a3b8;font-weight:600;">POLICY ACKNOWLEDGMENT</div><div style="font-size:11px;color:#94a3b8;">2 days ago</div></div>
+      </div>
+      <h3 style="font-size:16px;font-weight:700;color:#082f49;margin-bottom:8px;">Acceptable Use Policy</h3>
+      <p style="font-size:14px;line-height:1.7;color:#4c5454;margin-bottom:16px;">Your organization has published an updated Acceptable Use Policy. Please review and acknowledge by April 1, 2026.</p>
+      <div style="background:#fff3e0;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:13px;color:#ef6c00;font-weight:600;">
+        <i class="fas fa-clock" style="margin-right:6px;"></i> Due in 5 days
+      </div>
+      <button style="width:100%;padding:14px;background:#308c83;color:white;border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">Review Policy <i class="fas fa-external-link-alt" style="margin-left:6px;"></i></button>
+    </div>`,
+  all: `
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:13px;color:#94a3b8;">3 notifications</div>
+        <a href="#" style="font-size:12px;color:#308c83;font-weight:600;text-decoration:none;">Mark all read</a>
+      </div>
+      <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f4f8;cursor:pointer;" onmouseover="this.style.background='#f8fafb'" onmouseout="this.style.background='white'">
+          <div style="width:36px;height:36px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:14px;flex-shrink:0;"><i class="fas fa-book"></i></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#082f49;">New course assigned</div><div style="font-size:12px;color:#94a3b8;">Data Privacy Fundamentals &middot; Due Apr 5</div></div>
+          <div style="font-size:11px;color:#b0bec5;">2h ago</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f4f8;cursor:pointer;" onmouseover="this.style.background='#f8fafb'" onmouseout="this.style.background='white'">
+          <div style="width:36px;height:36px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#ef6c00;font-size:14px;flex-shrink:0;"><i class="fas fa-trophy"></i></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#082f49;">Badge earned</div><div style="font-size:12px;color:#94a3b8;">Security Starter</div></div>
+          <div style="font-size:11px;color:#b0bec5;">1d ago</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;" onmouseover="this.style.background='#f8fafb'" onmouseout="this.style.background='white'">
+          <div style="width:36px;height:36px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;color:#1565c0;font-size:14px;flex-shrink:0;"><i class="fas fa-file-signature"></i></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#082f49;">New policy</div><div style="font-size:12px;color:#94a3b8;">Acceptable Use Policy &middot; Due Apr 1</div></div>
+          <div style="font-size:11px;color:#b0bec5;">2d ago</div>
+        </div>
+      </div>
+    </div>`
+};
+
+// ==================== ASSIGNMENT DRAWER CONTENT ====================
+const assignmentDrawerContent = `
+  <div>
+    <!-- Drawer filter tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button onclick="filterDrawerAssignments(this,'all')" class="drawer-filter active" style="padding:8px 16px;border-radius:20px;border:1px solid #e2e8f0;background:#082f49;color:white;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;">All (8)</button>
+      <button onclick="filterDrawerAssignments(this,'in-progress')" class="drawer-filter" style="padding:8px 16px;border-radius:20px;border:1px solid #e2e8f0;background:white;color:#4c5454;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;">In Progress (2)</button>
+      <button onclick="filterDrawerAssignments(this,'not-started')" class="drawer-filter" style="padding:8px 16px;border-radius:20px;border:1px solid #e2e8f0;background:white;color:#4c5454;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;">Not Started (3)</button>
+      <button onclick="filterDrawerAssignments(this,'overdue')" class="drawer-filter" style="padding:8px 16px;border-radius:20px;border:1px solid #e2e8f0;background:white;color:#4c5454;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;">Overdue (1)</button>
+      <button onclick="filterDrawerAssignments(this,'completed')" class="drawer-filter" style="padding:8px 16px;border-radius:20px;border:1px solid #e2e8f0;background:white;color:#4c5454;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;">Completed (2)</button>
+    </div>
+    <!-- Assignment items -->
+    <div id="drawer-assignment-list" style="display:flex;flex-direction:column;gap:2px;">
+      <div class="drawer-assign-item" data-status="in-progress" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;color:#1565c0;font-size:14px;flex-shrink:0;"><i class="fas fa-spinner"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Phishing Awareness 101</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Compliance Foundations &middot; Due Mar 31</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:65%;background:#308c83;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">65%</div>
+        </div>
+        <button style="padding:8px 16px;background:#308c83;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Continue</button>
+      </div>
+      <div class="drawer-assign-item" data-status="not-started" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#f4f6f8;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;flex-shrink:0;"><i class="fas fa-circle"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Data Privacy Fundamentals</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Compliance Foundations &middot; Due Apr 5</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:0%;background:#308c83;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">0%</div>
+        </div>
+        <button style="padding:8px 16px;background:#308c83;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Start</button>
+      </div>
+      <div class="drawer-assign-item" data-status="not-started" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#f4f6f8;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;flex-shrink:0;"><i class="fas fa-circle"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Intro to AI Security</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Emerging Threats &middot; Due Apr 12</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:0%;background:#308c83;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">0%</div>
+        </div>
+        <button style="padding:8px 16px;background:#308c83;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Start</button>
+      </div>
+      <div class="drawer-assign-item" data-status="overdue" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;color:#c62828;font-size:14px;flex-shrink:0;"><i class="fas fa-exclamation-circle"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Password Security Basics</div>
+          <div style="font-size:12px;color:#c62828;margin-top:2px;font-weight:600;">Overdue &middot; Was due Mar 20</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:30%;background:#c62828;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">30%</div>
+        </div>
+        <button style="padding:8px 16px;background:#c62828;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Resume</button>
+      </div>
+      <div class="drawer-assign-item" data-status="in-progress" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;color:#1565c0;font-size:14px;flex-shrink:0;"><i class="fas fa-spinner"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Social Engineering Defense</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Security Awareness &middot; Due Apr 20</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:40%;background:#308c83;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">40%</div>
+        </div>
+        <button style="padding:8px 16px;background:#308c83;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Continue</button>
+      </div>
+      <div class="drawer-assign-item" data-status="not-started" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#f4f6f8;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;flex-shrink:0;"><i class="fas fa-circle"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Secure Remote Work</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Security Awareness &middot; Due May 1</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:0%;background:#308c83;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;">0%</div>
+        </div>
+        <button style="padding:8px 16px;background:#308c83;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Start</button>
+      </div>
+      <div class="drawer-assign-item" data-status="completed" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:14px;flex-shrink:0;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Email Security Essentials</div>
+          <div style="font-size:12px;color:#2e7d32;margin-top:2px;">Completed Mar 15 &middot; Score: 94%</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:100%;background:#2e7d32;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#2e7d32;font-weight:600;">100%</div>
+        </div>
+        <button style="padding:8px 16px;background:white;color:#308c83;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Review</button>
+      </div>
+      <div class="drawer-assign-item" data-status="completed" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f4f8;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:14px;flex-shrink:0;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Cyber Hygiene 101</div>
+          <div style="font-size:12px;color:#2e7d32;margin-top:2px;">Completed Mar 10 &middot; Score: 88%</div>
+        </div>
+        <div style="text-align:right;width:70px;">
+          <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="height:100%;width:100%;background:#2e7d32;border-radius:3px;"></div></div>
+          <div style="font-size:11px;color:#2e7d32;font-weight:600;">100%</div>
+        </div>
+        <button style="padding:8px 16px;background:white;color:#308c83;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Review</button>
+      </div>
+    </div>
+  </div>
+`;
+
+function filterDrawerAssignments(btn, filter) {
+  // Update active button style
+  document.querySelectorAll('.drawer-filter').forEach(b => {
+    b.style.background = 'white';
+    b.style.color = '#4c5454';
+  });
+  btn.style.background = '#082f49';
+  btn.style.color = 'white';
+  // Filter items
+  document.querySelectorAll('.drawer-assign-item').forEach(item => {
+    if (filter === 'all') {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = item.dataset.status === filter ? 'flex' : 'none';
+    }
+  });
+}
+
+// ==================== LEARNING DRAWER CONTENT ====================
+const learningDrawerContent = `
+  <div>
+    <div style="text-align:center;padding:8px 0 24px;">
+      <div style="display:inline-block;background:#ede7f6;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;color:#5e35b1;margin-bottom:16px;">Level 3</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div style="background:#e8f5e9;padding:16px;border-radius:10px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">📜</div>
+          <div style="font-size:24px;font-weight:800;color:#082f49;">2</div>
+          <div style="font-size:10px;font-weight:600;color:#4c5454;text-transform:uppercase;">Certificates</div>
+        </div>
+        <div style="background:#fff3e0;padding:16px;border-radius:10px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">🏆</div>
+          <div style="font-size:24px;font-weight:800;color:#082f49;">5</div>
+          <div style="font-size:10px;font-weight:600;color:#4c5454;text-transform:uppercase;">Badges</div>
+        </div>
+        <div style="background:#e3f2fd;padding:16px;border-radius:10px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">⭐</div>
+          <div style="font-size:24px;font-weight:800;color:#082f49;">340</div>
+          <div style="font-size:10px;font-weight:600;color:#4c5454;text-transform:uppercase;">Points</div>
+        </div>
+      </div>
+    </div>
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Certificates Earned</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="font-size:20px;">📜</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">Email Security Essentials</div>
+          <div style="font-size:11px;color:#94a3b8;">Earned Mar 15 &middot; Score: 94%</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;">
+        <div style="font-size:20px;">📜</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">Cyber Hygiene 101</div>
+          <div style="font-size:11px;color:#94a3b8;">Earned Mar 10 &middot; Score: 88%</div>
+        </div>
+      </div>
+    </div>
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Recent Badges</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="text-align:center;padding:14px;background:#f8fafb;border-radius:10px;">
+        <div style="font-size:24px;margin-bottom:4px;">🏆</div>
+        <div style="font-size:12px;font-weight:600;color:#082f49;">Security Starter</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:#f8fafb;border-radius:10px;">
+        <div style="font-size:24px;margin-bottom:4px;">🛡️</div>
+        <div style="font-size:12px;font-weight:600;color:#082f49;">Quick Learner</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:#f8fafb;border-radius:10px;">
+        <div style="font-size:24px;margin-bottom:4px;">🔥</div>
+        <div style="font-size:12px;font-weight:600;color:#082f49;">5-Day Streak</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:#f8fafb;border-radius:10px;">
+        <div style="font-size:24px;margin-bottom:4px;">📧</div>
+        <div style="font-size:12px;font-weight:600;color:#082f49;">Phish Spotter</div>
+      </div>
+    </div>
+  </div>
+`;
+
+// ==================== STATS DRAWER CONTENT ====================
+const statsDrawerContent = `
+  <div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:linear-gradient(135deg,#c1ddd8 0%,#d1faff 100%);padding:20px;border-radius:12px;text-align:center;">
+        <div style="font-size:32px;font-weight:800;color:#082f49;">8</div>
+        <div style="font-size:11px;font-weight:600;color:#308c83;text-transform:uppercase;">Total Courses</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#c1ddd8 0%,#d1faff 100%);padding:20px;border-radius:12px;text-align:center;">
+        <div style="font-size:32px;font-weight:800;color:#082f49;">2</div>
+        <div style="font-size:11px;font-weight:600;color:#308c83;text-transform:uppercase;">Completed</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#c1ddd8 0%,#d1faff 100%);padding:20px;border-radius:12px;text-align:center;">
+        <div style="font-size:32px;font-weight:800;color:#082f49;">92%</div>
+        <div style="font-size:11px;font-weight:600;color:#308c83;text-transform:uppercase;">Avg Score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#c1ddd8 0%,#d1faff 100%);padding:20px;border-radius:12px;text-align:center;">
+        <div style="font-size:32px;font-weight:800;color:#082f49;">5</div>
+        <div style="font-size:11px;font-weight:600;color:#308c83;text-transform:uppercase;">Day Streak</div>
+      </div>
+    </div>
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Monthly Breakdown</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <span style="font-size:13px;color:#082f49;font-weight:600;">March 2026</span>
+        <span style="font-size:13px;color:#308c83;font-weight:700;">1 completed</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <span style="font-size:13px;color:#082f49;font-weight:600;">February 2026</span>
+        <span style="font-size:13px;color:#308c83;font-weight:700;">1 completed</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;">
+        <span style="font-size:13px;color:#082f49;font-weight:600;">January 2026</span>
+        <span style="font-size:13px;color:#94a3b8;font-weight:600;">0 completed</span>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:14px 16px;background:#f8fafb;border-radius:10px;border-left:3px solid #308c83;font-size:13px;color:#4c5454;">
+      <i class="fas fa-lightbulb" style="color:#308c83;margin-right:6px;"></i>
+      You're ahead of <strong>68%</strong> of your team this month.
+    </div>
+  </div>
+`;
+
+// ==================== PATHS DRAWER CONTENT ====================
+const pathsDrawerContent = `
+  <div>
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:15px;font-weight:700;color:#082f49;">Cybersecurity Essentials</div>
+        <div style="font-size:14px;font-weight:700;color:#308c83;">40%</div>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:40%;background:linear-gradient(135deg,#308c83,#082f49);border-radius:4px;"></div>
+      </div>
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">5 courses &middot; 2 completed</div>
+      <div style="font-size:13px;color:#4c5454;">Next: <strong style="color:#308c83;cursor:pointer;">Phishing Awareness 101</strong></div>
+    </div>
+    <div style="border-top:1px solid #f0f4f8;padding-top:20px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:15px;font-weight:700;color:#082f49;">Compliance Foundations</div>
+        <div style="font-size:14px;font-weight:700;color:#308c83;">75%</div>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:75%;background:linear-gradient(135deg,#308c83,#082f49);border-radius:4px;"></div>
+      </div>
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">4 courses &middot; 3 completed</div>
+      <div style="font-size:13px;color:#4c5454;">Next: <strong style="color:#308c83;cursor:pointer;">Data Privacy Fundamentals</strong></div>
+    </div>
+    <div style="border-top:1px solid #f0f4f8;padding-top:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:15px;font-weight:700;color:#082f49;">Security Leadership</div>
+        <div style="font-size:14px;font-weight:700;color:#94a3b8;">Locked</div>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:0%;background:linear-gradient(135deg,#308c83,#082f49);border-radius:4px;"></div>
+      </div>
+      <div style="font-size:12px;color:#94a3b8;">Unlocks after completing Cybersecurity Essentials</div>
+    </div>
+  </div>
+`;
+
+// ==================== CYBERSECURITY DRAWER CONTENT (ESS + Phishing + Dark Web) ====================
+const essDrawerContent = `
+  <div>
+    <!-- ESS Score hero -->
+    <div style="text-align:center;padding:16px 0 20px;">
+      <div style="position:relative;width:140px;height:140px;margin:0 auto;">
+        <svg width="140" height="140" viewBox="0 0 140 140" style="transform:rotate(-90deg)">
+          <circle cx="70" cy="70" r="58" fill="none" stroke="#f0f4f8" stroke-width="12"/>
+          <circle cx="70" cy="70" r="58" fill="none" stroke="#308c83" stroke-width="12" stroke-linecap="round"
+            stroke-dasharray="364" stroke-dashoffset="95"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+          <div style="font-size:36px;font-weight:800;color:#082f49;line-height:1;">74</div>
+          <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;">ESS</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:inline-block;background:#e8f5e9;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;color:#2e7d32;">
+        <i class="fas fa-arrow-up" style="margin-right:4px;"></i> +3 from last month
+      </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">Score Breakdown</h4>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:600;color:#082f49;">Training</span>
+        <span style="font-size:13px;font-weight:700;color:#2e7d32;">85%</span>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:85%;background:#2e7d32;border-radius:4px;"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:600;color:#082f49;">Phishing</span>
+        <span style="font-size:13px;font-weight:700;color:#ef6c00;">60%</span>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:60%;background:#ef6c00;border-radius:4px;"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:600;color:#082f49;">Dark Web</span>
+        <span style="font-size:13px;font-weight:700;color:#2e7d32;">90%</span>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:90%;background:#2e7d32;border-radius:4px;"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:600;color:#082f49;">Policies</span>
+        <span style="font-size:13px;font-weight:700;color:#ef6c00;">67%</span>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:67%;background:#ef6c00;border-radius:4px;"></div>
+      </div>
+    </div>
+
+    <!-- Phishing Detail -->
+    <div style="border-top:2px solid #f0f4f8;padding-top:20px;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#ef6c00;font-size:12px;"><i class="fas fa-fish"></i></div>
+        <h4 style="font-size:14px;font-weight:700;color:#082f49;margin:0;">Phishing Simulations</h4>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:#f8fafb;padding:12px 8px;border-radius:8px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#082f49;">83%</div>
+          <div style="font-size:9px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Score</div>
+        </div>
+        <div style="background:#f8fafb;padding:12px 8px;border-radius:8px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#082f49;">6</div>
+          <div style="font-size:9px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Tests</div>
+        </div>
+        <div style="background:#f8fafb;padding:12px 8px;border-radius:8px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#082f49;">1</div>
+          <div style="font-size:9px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Clicked</div>
+        </div>
+      </div>
+      <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f4f8;">
+          <div style="width:24px;height:24px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:10px;"><i class="fas fa-check"></i></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#082f49;">Account Verification Email</div><div style="font-size:10px;color:#94a3b8;">Mar 23 &middot; Reported</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f4f8;">
+          <div style="width:24px;height:24px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:10px;"><i class="fas fa-check"></i></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#082f49;">Package Delivery Notice</div><div style="font-size:10px;color:#94a3b8;">Mar 10 &middot; Ignored</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f4f8;">
+          <div style="width:24px;height:24px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;color:#c62828;font-size:10px;"><i class="fas fa-times"></i></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#082f49;">IT Password Reset</div><div style="font-size:10px;color:#c62828;">Feb 28 &middot; Clicked link</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:10px;"><i class="fas fa-check"></i></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#082f49;">Shared Document Alert</div><div style="font-size:10px;color:#94a3b8;">Feb 15 &middot; Reported</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark Web Detail -->
+    <div style="border-top:2px solid #f0f4f8;padding-top:20px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:12px;"><i class="fas fa-user-secret"></i></div>
+        <h4 style="font-size:14px;font-weight:700;color:#082f49;margin:0;">Dark Web Monitoring</h4>
+      </div>
+      <div style="padding:16px;background:#e8f5e9;border-radius:10px;text-align:center;margin-bottom:14px;">
+        <div style="font-size:15px;font-weight:700;color:#2e7d32;"><i class="fas fa-shield-halved" style="margin-right:6px;"></i>No Breaches Found</div>
+        <div style="font-size:12px;color:#66bb6a;margin-top:4px;">Last scanned: March 25, 2026</div>
+      </div>
+      <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f4f8;">
+          <i class="fas fa-envelope" style="color:#308c83;font-size:13px;"></i>
+          <span style="font-size:12px;color:#082f49;font-weight:600;">john.d@company.com</span>
+          <span style="margin-left:auto;font-size:10px;color:#2e7d32;font-weight:600;">Clear</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;">
+          <i class="fas fa-envelope" style="color:#308c83;font-size:13px;"></i>
+          <span style="font-size:12px;color:#082f49;font-weight:600;">jdeblasio@company.com</span>
+          <span style="margin-left:auto;font-size:10px;color:#2e7d32;font-weight:600;">Clear</span>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:#f8fafb;border-radius:8px;font-size:12px;color:#94a3b8;line-height:1.5;">
+        <i class="fas fa-info-circle" style="color:#308c83;margin-right:4px;"></i>
+        Monitoring runs automatically. Alerts sent if a breach is detected.
+      </div>
+    </div>
+  </div>
+`;
+
+// ==================== POLICIES DRAWER CONTENT ====================
+const policiesDrawerContent = `
+  <div>
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Pending</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#ef6c00;font-size:13px;"><i class="fas fa-clock"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Acceptable Use Policy</div>
+          <div style="font-size:12px;color:#ef6c00;font-weight:600;">Due Apr 1, 2026</div>
+        </div>
+        <button style="padding:8px 16px;background:#308c83;color:white;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;">Review</button>
+      </div>
+    </div>
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Acknowledged</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:13px;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Data Handling Policy</div>
+          <div style="font-size:12px;color:#94a3b8;">Acknowledged Mar 10, 2026</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:13px;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#082f49;">Remote Work Security Policy</div>
+          <div style="font-size:12px;color:#94a3b8;">Acknowledged Feb 22, 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+// ==================== AI ADOPTION DRAWER CONTENT ====================
+const aiDrawerContent = `
+  <div>
+    <!-- Score hero -->
+    <div style="display:flex;align-items:center;gap:20px;background:linear-gradient(135deg,#ede9fe,#f5f3ff);border-radius:14px;padding:20px;margin-bottom:20px;">
+      <div class="ess-score-ring" style="width:90px;height:90px;">
+        <svg width="90" height="90" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#e9d5ff" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#7c3aed" stroke-width="10" stroke-linecap="round"
+            stroke-dasharray="314" stroke-dashoffset="173"/>
+        </svg>
+        <div class="score-text">
+          <div class="score-num" style="color:#7c3aed;font-size:22px;">45%</div>
+          <div class="score-label">Adopted</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#082f49;">AI Adoption Score</div>
+        <div style="font-size:13px;color:#7c3aed;font-weight:600;margin-top:4px;"><i class="fas fa-arrow-up"></i> +12% this month</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:6px;">Based on tool usage, training completion, and policy acknowledgment</div>
+      </div>
+    </div>
+    <!-- Stats grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:#f8fafb;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#7c3aed;">3</div>
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Tools Used</div>
+        <div style="font-size:11px;color:#b0bec5;margin-top:2px;">of 7 available</div>
+      </div>
+      <div style="background:#f8fafb;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#9333ea;">60%</div>
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;">AI Training</div>
+        <div style="font-size:11px;color:#b0bec5;margin-top:2px;">3 of 5 courses done</div>
+      </div>
+    </div>
+    <!-- AI Tools breakdown -->
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">AI Tools</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:8px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:11px;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Microsoft Copilot</div>
+        <div style="font-size:11px;color:#2e7d32;font-weight:600;">Active</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:8px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:11px;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">ChatGPT / OpenAI</div>
+        <div style="font-size:11px;color:#2e7d32;font-weight:600;">Active</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:8px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:11px;"><i class="fas fa-check"></i></div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">GitHub Copilot</div>
+        <div style="font-size:11px;color:#2e7d32;font-weight:600;">Active</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:8px;background:#f0f4f8;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;"><i class="fas fa-minus"></i></div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#94a3b8;">Gemini</div>
+        <div style="font-size:11px;color:#94a3b8;">Not used</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;">
+        <div style="width:28px;height:28px;border-radius:8px;background:#fce7f3;display:flex;align-items:center;justify-content:center;color:#db2777;font-size:11px;"><i class="fas fa-exclamation"></i></div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">AI Policy</div>
+        <div style="font-size:11px;color:#db2777;font-weight:600;">Pending review</div>
+      </div>
+    </div>
+    <button style="width:100%;padding:12px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
+      Explore AI Tools <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+`;
+
+// ==================== MANAGER DRAWER CONTENT ====================
+const managerDrawerContent = `
+  <div>
+    <!-- Team stats hero -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:#f8fafb;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#082f49;">72%</div>
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Compliant</div>
+      </div>
+      <div style="background:#fce4ec;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#c62828;">3</div>
+        <div style="font-size:11px;font-weight:600;color:#c62828;text-transform:uppercase;">Overdue</div>
+      </div>
+      <div style="background:#f8fafb;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#082f49;">8</div>
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Members</div>
+      </div>
+    </div>
+    <!-- Alerts -->
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Action Required</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#fce4ec;display:flex;align-items:center;justify-content:center;color:#c62828;font-size:13px;flex-shrink:0;"><i class="fas fa-clock"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">3 members with overdue training</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Sarah K., Mike R., Dana T. · Phishing Awareness 101</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;background:#fce4ec;color:#c62828;padding:2px 8px;border-radius:8px;white-space:nowrap;">Overdue</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#e65100;font-size:13px;flex-shrink:0;"><i class="fas fa-file-signature"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">2 members haven't acknowledged policy</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Acceptable Use Policy · Due Apr 15</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:8px;white-space:nowrap;">Due Soon</span>
+      </div>
+    </div>
+    <!-- Team list -->
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Team Overview</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#c62828;">S</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Sarah Kim</div>
+        <div style="font-size:12px;font-weight:700;color:#c62828;">0%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#e65100;">M</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Mike Russo</div>
+        <div style="font-size:12px;font-weight:700;color:#e65100;">20%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#e65100;">D</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Dana Torres</div>
+        <div style="font-size:12px;font-weight:700;color:#e65100;">10%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#2e7d32;">A</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Alex Chen</div>
+        <div style="font-size:12px;font-weight:700;color:#2e7d32;">100%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f8fafb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#082f49;">J</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Jordan Lee</div>
+        <div style="font-size:12px;font-weight:700;color:#082f49;">85%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f8fafb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#082f49;">P</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Priya Nair</div>
+        <div style="font-size:12px;font-weight:700;color:#082f49;">90%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f8fafb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#082f49;">T</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Tom Walsh</div>
+        <div style="font-size:12px;font-weight:700;color:#082f49;">75%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f8fafb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#082f49;">M</div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">Mia Patel</div>
+        <div style="font-size:12px;font-weight:700;color:#082f49;">60%</div>
+      </div>
+    </div>
+  </div>
+`;
+
+// ==================== PARTNER ADMIN DRAWER CONTENT ====================
+const paDrawerContent = `
+  <div>
+    <!-- Summary stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:#f8fafb;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#082f49;">12</div>
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Clients</div>
+      </div>
+      <div style="background:#fce4ec;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#c62828;">4</div>
+        <div style="font-size:11px;font-weight:600;color:#c62828;text-transform:uppercase;">Open Tasks</div>
+      </div>
+      <div style="background:#e0e7ff;padding:16px;border-radius:10px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#4338ca;">247</div>
+        <div style="font-size:11px;font-weight:600;color:#4338ca;text-transform:uppercase;">Total Users</div>
+      </div>
+    </div>
+    <!-- Priority tasks -->
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Priority Tasks</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#fce4ec;display:flex;align-items:center;justify-content:center;color:#c62828;font-size:13px;flex-shrink:0;"><i class="fas fa-building"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">Acme Corp — Setup incomplete</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Awaiting user import · 12 seats unassigned</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;background:#fce4ec;color:#c62828;padding:2px 8px;border-radius:8px;">Action</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#e65100;font-size:13px;flex-shrink:0;"><i class="fas fa-file-chart-column"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">Q2 compliance reports due</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">8 of 12 clients ready · Due Apr 15</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:8px;">Due Soon</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f4f8;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#e65100;font-size:13px;flex-shrink:0;"><i class="fas fa-user-plus"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">New user invitations pending</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">5 users across 3 clients not yet activated</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:8px;">Due Soon</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;color:#0284c7;font-size:13px;flex-shrink:0;"><i class="fas fa-rotate"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#082f49;">Subscription renewal: TechStart LLC</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Renews May 1 · 25 seats</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;background:#e0f2fe;color:#0284c7;padding:2px 8px;border-radius:8px;">Upcoming</span>
+      </div>
+    </div>
+    <!-- Client health summary -->
+    <h4 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Client Health</h4>
+    <div style="border:1px solid #f0f4f8;border-radius:10px;overflow:hidden;">
+      ${[['Acme Corp','Setup Pending','#c62828','#fce4ec'],['TechStart LLC','82% compliant','#2e7d32','#e8f5e9'],['Riverdale Schools','71% compliant','#082f49','#f8fafb'],['Summit Health','94% compliant','#2e7d32','#e8f5e9'],['Blue Ridge Co.','55% compliant','#e65100','#fff3e0']].map((c,i)=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:${i<4?'1px solid #f0f4f8':'none'}">
+          <div style="width:28px;height:28px;border-radius:8px;background:${c[3]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${c[2]};">${c[0].charAt(0)}</div>
+          <div style="flex:1;font-size:13px;font-weight:600;color:#082f49;">${c[0]}</div>
+          <div style="font-size:12px;font-weight:600;color:${c[2]};">${c[1]}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+`;
+
+// ==================== WIDGET TOGGLE ====================
+function toggleWidget(name) {
+  const el = document.getElementById('widget-' + name);
+  const cb = document.getElementById('tog-' + name);
+  if (cb.checked) {
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
+}
+
+// ==================== LIFECYCLE STATES ====================
+const states = {
+  new: {
+    greeting: 'Welcome to BSN, <span>John</span>! 👋',
+    message: 'This is your training dashboard. Here you\'ll find courses assigned to you, track your progress, and earn certificates. Let\'s get started!',
+    cta: '<i class="fas fa-play-circle"></i> <span>Watch the Quick Tour (2 min)</span>',
+    stat1: { num: '0%', label: 'Complete' },
+    stat2: { num: '0', label: 'Day Streak' },
+    badge: '0',
+  },
+  active: {
+    greeting: 'Good afternoon, <span>John</span>',
+    message: 'You\'re on a <strong>5-day streak</strong> — keep the momentum going! Pick up where you left off below.',
+    cta: '<i class="fas fa-play-circle"></i> <span>Continue: Phishing Awareness 101</span>',
+    stat1: { num: '29%', label: 'Complete' },
+    stat2: { num: '5', label: 'Day Streak' },
+    badge: '3',
+  },
+  completed: {
+    greeting: 'You\'re all caught up, <span>John</span>! 🎉',
+    message: 'All required courses are complete. Your average score is 92%. Why not explore the library or revisit previous material?',
+    cta: '<i class="fas fa-compass"></i> <span>Explore the Course Library</span>',
+    stat1: { num: '100%', label: 'Complete' },
+    stat2: { num: '92%', label: 'Avg Score' },
+    badge: '1',
+  },
+  discovery: {
+    greeting: 'Looking to learn more, <span>John</span>? 🚀',
+    message: 'You\'ve completed all available courses! Check out upcoming content or challenge yourself on the leaderboard.',
+    cta: '<i class="fas fa-trophy"></i> <span>View Leaderboard</span>',
+    stat1: { num: '#7', label: 'Your Rank' },
+    stat2: { num: '340', label: 'Points' },
+    badge: '0',
+  }
+};
+
+function setLifecycleState(state) {
+  const s = states[state];
+  document.getElementById('pw-greeting').innerHTML = s.greeting;
+  document.getElementById('pw-message').innerHTML = s.message;
+  document.getElementById('pw-cta').innerHTML = s.cta;
+  const countEl = document.getElementById('notif-count');
+  if (s.badge === '0') { countEl.style.display = 'none'; }
+  else { countEl.style.display = 'flex'; countEl.textContent = s.badge; }
+  // Update active button
+  document.querySelectorAll('.dev-section:first-child .state-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ==================== DEV TOOL ====================
+function toggleDevTool() {
+  document.getElementById('dev-panel').classList.toggle('open');
+}
+
+// ==================== DRAWER ====================
+function openDrawer(title, content) {
+  document.getElementById('drawer-title').textContent = title;
+  document.getElementById('drawer-body').innerHTML = content;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+// Wire up click-to-drawer on assignment items
+document.querySelectorAll('.assignment-name').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', function() {
+    const name = this.textContent;
+    openDrawer(name, `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:13px; color:#94a3b8; margin-bottom:8px;">Course Details</div>
+        <p style="font-size:14px; line-height:1.7; color:#4c5454;">This course covers essential concepts and practical techniques. Click "Continue" or "Start" to launch the full course experience in a new page.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div style="background:#f8fafb; padding:14px; border-radius:10px; text-align:center;">
+          <div style="font-size:22px; font-weight:800; color:#082f49;">45</div>
+          <div style="font-size:11px; color:#94a3b8; font-weight:600;">MINUTES</div>
+        </div>
+        <div style="background:#f8fafb; padding:14px; border-radius:10px; text-align:center;">
+          <div style="font-size:22px; font-weight:800; color:#082f49;">8</div>
+          <div style="font-size:11px; color:#94a3b8; font-weight:600;">MODULES</div>
+        </div>
+      </div>
+      <button style="width:100%; padding:14px; background:#308c83; color:white; border:none; border-radius:10px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">
+        Launch Course <i class="fas fa-external-link-alt" style="margin-left:6px;"></i>
+      </button>
+    `);
+  });
+});
+
+// Wire up click on achievement cards
+document.querySelectorAll('.achievement-card').forEach(el => {
+  el.addEventListener('click', function() {
+    const type = this.querySelector('.ach-label').textContent;
+    openDrawer('My ' + type, `
+      <p style="font-size:14px; color:#4c5454; margin-bottom:20px;">View and manage all your earned ${type.toLowerCase()}.</p>
+      <div style="text-align:center; padding:40px; color:#c1ddd8;">
+        <i class="fas fa-award" style="font-size:48px;"></i>
+        <p style="margin-top:12px; font-size:13px; color:#94a3b8;">Full ${type.toLowerCase()} detail page coming in the next iteration.</p>
+      </div>
+    `);
+  });
+});
+
+// Start with New User state active
+setLifecycleState('new');
+</script>
+
+</body>
+</html>
